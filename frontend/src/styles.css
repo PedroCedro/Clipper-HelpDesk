@@ -1,0 +1,93 @@
+:root {
+  color: #132238;
+  background: linear-gradient(180deg, #f4efe4 0%, #dbe7ef 100%);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.dashboard {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 24px 72px;
+}
+
+.hero {
+  padding: 40px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 20px 50px rgba(19, 34, 56, 0.08);
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #8a4b2a;
+}
+
+.hero h1 {
+  margin: 0 0 16px;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.05;
+}
+
+.lead {
+  margin: 0;
+  max-width: 640px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.widget {
+  margin-top: 24px;
+  padding: 28px;
+  border-radius: 20px;
+  background: #132238;
+  color: #f4efe4;
+}
+
+.widget h2 {
+  margin-top: 0;
+}
+
+.widget-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #68d391;
+}
+
+@media (max-width: 640px) {
+  .dashboard {
+    padding: 24px 16px 48px;
+  }
+
+  .hero,
+  .widget {
+    padding: 24px;
+  }
+}
