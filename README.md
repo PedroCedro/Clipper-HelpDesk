@@ -2,30 +2,30 @@
 
 ![Clipper Office](docs/clipper-office.png)
 
-Clipper Helpdesk e um sistema de atendimento projetado para receber chamados de suporte e executar um diagnostico automatizado inicial antes da intervencao de um tecnico humano.
+Clipper Helpdesk é um sistema de atendimento projetado para receber chamados de suporte e executar um diagnóstico automatizado inicial antes da intervenção de um técnico humano.
 
-O assistente de automacao se chama `Clipper`. Ele le novos tickets, interpreta o contexto do problema, aplica regras de diagnostico e prepara um resumo inicial para acelerar a atuacao da equipe tecnica.
+O assistente de automação se chama `Clipper`. Ele lê novos tickets, interpreta o contexto do problema, aplica regras de diagnóstico e prepara um resumo inicial para acelerar a atuação da equipe técnica.
 
-## Visao Geral
+## Visão Geral
 
-O objetivo do projeto e transformar o primeiro atendimento em um fluxo mais inteligente:
+O objetivo do projeto é transformar o primeiro atendimento em um fluxo mais inteligente:
 
-- o usuario abre um ticket
-- o `Clipper` executa uma analise automatica inicial
-- o sistema sugere causas provaveis e proximos passos
-- o tecnico humano recebe o caso com mais contexto e menos triagem manual
+- o usuário abre um ticket
+- o `Clipper` executa uma análise automatizada inicial
+- o sistema sugere causas prováveis e próximos passos
+- o técnico humano recebe o caso com mais contexto e menos triagem manual
 
-Isso reduz o tempo gasto nas etapas repetitivas e prepara o sistema para evoluir para automacoes mais avancadas no futuro.
+Isso reduz o tempo gasto nas etapas repetitivas e prepara o sistema para evoluir para automações mais avançadas no futuro.
 
 ## O Papel do Clipper
 
-O `Clipper` e o nucleo de automacao da plataforma. Ele foi pensado para atuar antes da triagem humana, ajudando a classificar o chamado e levantar hipoteses iniciais.
+O `Clipper` é o núcleo de automação da plataforma. Ele foi pensado para atuar antes da triagem humana, ajudando a classificar o chamado e levantar hipóteses iniciais.
 
 Responsabilidades esperadas:
 
-- ler tickets de suporte recem-criados
-- executar regras de diagnostico predefinidas
-- produzir um resumo diagnostico inicial
+- ler tickets de suporte recém-criados
+- executar regras de diagnóstico predefinidas
+- produzir um resumo diagnóstico inicial
 - sugerir artigos relacionados da base de conhecimento
 - preparar tickets para triagem humana
 
@@ -37,10 +37,10 @@ Responsabilidades esperadas:
 ## Objetivos do Projeto
 
 - Estrutura inspirada em clean architecture
-- Pacotes modulares por capacidade de negocio
+- Pacotes modulares por capacidade de negócio
 - Preparado para uma futura camada de automacao centrada no `Clipper`
 
-## Estrutura do Repositorio
+## Estrutura do Repositório
 
 ```text
 clipper-helpdesk/
@@ -55,7 +55,7 @@ clipper-helpdesk/
     └── src/
 ```
 
-Este repositorio contem a estrutura inicial para essa evolucao, com classes placeholder para o dominio de tickets e para o motor de diagnostico.
+Este repositório contém a estrutura inicial para essa evolução, com classes placeholder para o domínio de tickets e para o motor de diagnóstico.
 
 ## Como Executar o Backend
 
@@ -63,16 +63,16 @@ Requisitos:
 
 - Java 21
 - Maven 3.9+
-- PostgreSQL disponivel para integracao futura
+- PostgreSQL disponível para integração futura
 
-Execucao:
+Execução:
 
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
-Endpoint de saude:
+Endpoint de saúde:
 
 ```text
 GET /api/health
@@ -84,7 +84,7 @@ Requisitos:
 
 - Node.js 20+
 
-Execucao:
+Execução:
 
 ```bash
 cd frontend
