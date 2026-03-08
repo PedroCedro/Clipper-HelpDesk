@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 public class DiagnosticEngine {
 
     public String run(Ticket ticket) {
-        return "Diagnostico inicial preparado para o ticket: " + ticket.getTitle();
+        return "Diagnóstico inicial preparado para o ticket: " + ticket.getTitle();
     }
 }
