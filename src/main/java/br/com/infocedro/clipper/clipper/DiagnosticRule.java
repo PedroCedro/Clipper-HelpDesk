@@ -1,4 +1,4 @@
-package com.clipper.clipper;
+package br.com.infocedro.clipper.clipper;
 
 public class DiagnosticRule {
 

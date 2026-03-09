@@ -1,4 +1,4 @@
-package com.clipper.ticket;
+package br.com.infocedro.clipper.ticket;
 
 import java.util.List;
 import org.springframework.stereotype.Service;

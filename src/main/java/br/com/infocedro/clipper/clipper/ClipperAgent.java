@@ -1,6 +1,6 @@
-package com.clipper.clipper;
+package br.com.infocedro.clipper.clipper;
 
-import com.clipper.ticket.Ticket;
+import br.com.infocedro.clipper.ticket.Ticket;
 import org.springframework.stereotype.Component;
 
 @Component

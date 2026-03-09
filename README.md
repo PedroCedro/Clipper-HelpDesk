@@ -1,81 +1,81 @@
-# Clipper Helpdesk
+# Clipper
 
 ![Clipper Office](docs/clipper-office.png)
 
-Clipper Helpdesk é um sistema de atendimento projetado para receber chamados de suporte e executar um diagnóstico automatizado inicial antes da intervenção de um técnico humano.
+Clipper e um sistema de atendimento projetado para receber chamados de suporte e executar um diagnostico automatizado inicial antes da intervencao de um tecnico humano.
 
-O assistente de automação se chama `Clipper`. Ele lê novos tickets, interpreta o contexto do problema, aplica regras de diagnóstico e prepara um resumo inicial para acelerar a atuação da equipe técnica.
+O assistente de automacao se chama `Clipper`. Ele le novos tickets, interpreta o contexto do problema, aplica regras de diagnostico e prepara um resumo inicial para acelerar a atuacao da equipe tecnica.
 
 ## Visão Geral
 
-O objetivo do projeto é transformar o primeiro atendimento em um fluxo mais inteligente:
+O objetivo do projeto e transformar o primeiro atendimento em um fluxo mais inteligente:
 
 - o usuário abre um ticket
-- o `Clipper` executa uma análise automatizada inicial
+- o `Clipper` executa uma analise automatizada inicial
 - o sistema sugere causas prováveis e próximos passos
-- o técnico humano recebe o caso com mais contexto e menos triagem manual
+- o tecnico humano recebe o caso com mais contexto e menos triagem manual
 
-Isso reduz o tempo gasto nas etapas repetitivas e prepara o sistema para evoluir para automações mais avançadas no futuro.
+Isso reduz o tempo gasto nas etapas repetitivas e prepara o sistema para evoluir para automacoes mais avancadas no futuro.
 
 ## O Papel do Clipper
 
-O `Clipper` é o núcleo de automação da plataforma. Ele foi pensado para atuar antes da triagem humana, ajudando a classificar o chamado e levantar hipóteses iniciais.
+O `Clipper` e o nucleo de automacao da plataforma. Ele foi pensado para atuar antes da triagem humana, ajudando a classificar o chamado e levantar hipoteses iniciais.
 
 Responsabilidades esperadas:
 
-- ler tickets de suporte recém-criados
-- executar regras de diagnóstico predefinidas
-- produzir um resumo diagnóstico inicial
+- ler tickets de suporte recem-criados
+- executar regras de diagnostico predefinidas
+- produzir um resumo diagnostico inicial
 - sugerir artigos relacionados da base de conhecimento
 - preparar tickets para triagem humana
 
 ## Stack Tecnologica
 
-- Backend: Java 21, Spring Boot, Maven, PostgreSQL, API REST
+- Backend: Java 21, Spring Boot, Maven Wrapper, PostgreSQL, API REST
 - Frontend: React, Vite, TypeScript
 
 ## Objetivos do Projeto
 
 - Estrutura inspirada em clean architecture
-- Pacotes modulares por capacidade de negócio
+- Pacotes modulares por capacidade de negocio
 - Preparado para uma futura camada de automacao centrada no `Clipper`
 
 ## Estrutura do Repositório
 
 ```text
-clipper-helpdesk/
+clipper/
 ├── README.md
 ├── docs/
 │   └── clipper-office.png
-├── backend/
-│   ├── pom.xml
-│   └── src/main/java/com/clipper
+├── pom.xml
+├── src/
+│   └── main/java/br/com/infocedro/clipper
 └── frontend/
     ├── package.json
     └── src/
 ```
 
-Este repositório contém a estrutura inicial para essa evolução, com classes placeholder para o domínio de tickets e para o motor de diagnóstico.
+Este repositorio contem a base atual do projeto, com backend Spring Boot estruturado pelo Spring Initializr e frontend React/Vite separado em `frontend/`.
 
 ## Como Executar o Backend
 
 Requisitos:
 
 - Java 21
-- Maven 3.9+
+- Git Bash ou PowerShell
 - PostgreSQL disponível para integração futura
 
 Execução:
 
-```bash
-cd backend
-mvn spring-boot:run
+```powershell
+.\mvnw.cmd spring-boot:run
 ```
 
-Endpoint de saúde:
+Endpoints iniciais:
 
 ```text
 GET /api/health
+GET /api/tickets
 ```
 
 ## Como Executar o Frontend
@@ -86,8 +86,20 @@ Requisitos:
 
 Execução:
 
-```bash
+```powershell
 cd frontend
 npm install
 npm run dev
 ```
+
+Observações de desenvolvimento local:
+
+- o frontend espera o backend em `http://localhost:8080`
+- o Vite faz proxy automático de `/api` para o backend durante `npm run dev`
+- se preferir chamar a API Spring diretamente no navegador, o backend libera CORS para `http://localhost:5173`
+
+## Estado Atual
+
+- o backend novo roda na raiz do projeto com `pom.xml`, `src/` e `mvnw.cmd`
+- o frontend foi consolidado em `frontend/`
+- a pasta antiga `Clipper-HelpDesk` foi descontinuada como base principal

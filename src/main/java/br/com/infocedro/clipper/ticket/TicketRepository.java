@@ -1,4 +1,4 @@
-package com.clipper.ticket;
+package br.com.infocedro.clipper.ticket;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class TicketRepository {
         tickets.add(new Ticket(
                 1L,
                 "Erro ao abrir o sistema",
-                "Usuário relata falha ao iniciar o módulo principal.",
+                "Usuario relata falha ao iniciar o modulo principal.",
                 "NOVO"
         ));
     }

@@ -1,4 +1,4 @@
-package com.clipper.ticket;
+package br.com.infocedro.clipper.ticket;
 
 import java.util.List;
 import java.util.Map;
@@ -18,7 +18,7 @@ public class TicketController {
 
     @GetMapping("/health")
     public Map<String, String> health() {
-        return Map.of("status", "ATIVO", "service", "clipper-helpdesk");
+        return Map.of("status", "ATIVO", "service", "clipper");
     }
 
     @GetMapping("/tickets")

@@ -1,4 +1,4 @@
-package com.clipper.knowledge;
+package br.com.infocedro.clipper.knowledge;
 
 public class KnowledgeArticle {
 

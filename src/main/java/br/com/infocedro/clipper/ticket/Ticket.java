@@ -1,9 +1,8 @@
-package com.clipper.ticket;
+package br.com.infocedro.clipper.ticket;
 
 public class Ticket {
 
     private Long id;
-
     private String title;
     private String description;
     private String status;
