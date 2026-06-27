@@ -38,3 +38,6 @@ build/
 *.log
 .env
 .env.*
+
+# Local-only docs (governanca/notas que ficam so na maquina)
+*.local
