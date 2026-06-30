@@ -19,4 +19,10 @@ public class TicketService {
     public Ticket createTicket(Ticket ticket) {
         return ticketRepository.save(ticket);
     }
+
+    public Ticket findById(Long id) {
+    return ticketRepository.findById(id)
+        .orElseThrow(() -> new IllegalArgumentException("Ticket não encontrado: id " + id));
+}
+
 }

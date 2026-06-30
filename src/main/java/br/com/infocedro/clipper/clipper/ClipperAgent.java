@@ -1,6 +1,5 @@
 package br.com.infocedro.clipper.clipper;
 
-import br.com.infocedro.clipper.ticket.Ticket;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,7 +11,8 @@ public class ClipperAgent {
         this.diagnosticEngine = diagnosticEngine;
     }
 
-    public String analyze(Ticket ticket) {
-        return diagnosticEngine.run(ticket);
+    // Recebe o contrato e repassa pro motor. O agente também não conhece mais Ticket.
+    public String analyze(DiagnosticRequest request) {
+        return diagnosticEngine.run(request);
     }
 }

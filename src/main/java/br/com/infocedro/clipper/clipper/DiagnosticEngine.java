@@ -1,12 +1,13 @@
 package br.com.infocedro.clipper.clipper;
 
-import br.com.infocedro.clipper.ticket.Ticket;
 import org.springframework.stereotype.Component;
 
 @Component
 public class DiagnosticEngine {
 
-    public String run(Ticket ticket) {
-        return "Diagnostico inicial preparado para o ticket: " + ticket.getTitle();
+    // Agora dependemos só do contrato DiagnosticRequest (mesmo pacote, sem import).
+    // O motor não sabe mais o que é um "Ticket" — exatamente o que a costura buscava.
+    public String run(DiagnosticRequest request) {
+        return "Diagnostico inicial preparado para o ticket: " + request.title();
     }
 }
