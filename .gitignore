@@ -41,3 +41,6 @@ build/
 
 # Local-only docs (governanca/notas que ficam so na maquina)
 *.local
+
+# Banco H2 de desenvolvimento (arquivo local, nao versionar)
+/data/
