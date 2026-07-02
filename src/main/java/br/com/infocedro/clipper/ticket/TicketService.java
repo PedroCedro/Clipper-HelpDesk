@@ -22,7 +22,7 @@ public class TicketService {
 
     public Ticket findById(Long id) {
     return ticketRepository.findById(id)
-        .orElseThrow(() -> new IllegalArgumentException("Ticket não encontrado: id " + id));
+        .orElseThrow(() -> new TicketNotFoundException(id));
 }
 
 }
