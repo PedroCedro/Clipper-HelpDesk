@@ -12,7 +12,7 @@ public class ClipperAgent {
     }
 
     // Recebe o contrato e repassa pro motor. O agente também não conhece mais Ticket.
-    public String analyze(DiagnosticRequest request) {
+    public DiagnosticResult analyze(DiagnosticRequest request) {
         return diagnosticEngine.run(request);
     }
 }

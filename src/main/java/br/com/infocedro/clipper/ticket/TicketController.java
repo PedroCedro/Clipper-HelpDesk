@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import br.com.infocedro.clipper.clipper.ClipperAgent;
 import br.com.infocedro.clipper.clipper.DiagnosticRequest;
+import br.com.infocedro.clipper.clipper.DiagnosticResult;
 
 
 @RestController
@@ -40,7 +41,7 @@ public class TicketController {
     }
 
     @PostMapping("/tickets/{id}/diagnose")
-    public Map<String, String> diagnose(@PathVariable Long id) {
+    public Map<String, DiagnosticResult> diagnose(@PathVariable Long id) {
     // 1) busca o ticket (módulo ticket)
     Ticket ticket = ticketService.findById(id);
 
@@ -48,7 +49,7 @@ public class TicketController {
     DiagnosticRequest request = new DiagnosticRequest(ticket.getTitle(), ticket.getDescription());
 
     // 3) chama o motor (módulo clipper) só com o contrato
-    String diagnosis = clipperAgent.analyze(request);
+    DiagnosticResult diagnosis = clipperAgent.analyze(request);
 
     return Map.of("diagnosis", diagnosis);
 }
