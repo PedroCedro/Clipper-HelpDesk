@@ -38,9 +38,11 @@ build/
 *.log
 .env
 .env.*
+*.env
+temp.ps1
 
-# Local-only docs (governanca/notas que ficam so na maquina)
+# Local-only docs (governança/notas que ficam só na máquina)
 *.local
 
-# Banco H2 de desenvolvimento (arquivo local, nao versionar)
+# Banco H2 de desenvolvimento (arquivo local, não versionar)
 /data/
