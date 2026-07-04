@@ -2,34 +2,34 @@
 
 ![Clipper Office](docs/clipper-office.png)
 
-Clipper e um sistema de atendimento projetado para receber chamados de suporte e executar um diagnostico automatizado inicial antes da intervencao de um tecnico humano.
+Clipper é um sistema de atendimento projetado para receber chamados de suporte e executar um diagnóstico automatizado inicial antes da intervenção de um técnico humano.
 
-O assistente de automacao se chama `Clipper`. Ele le novos tickets, interpreta o contexto do problema, aplica regras de diagnostico e prepara um resumo inicial para acelerar a atuacao da equipe tecnica.
+O assistente de automação se chama `Clipper`. Ele lê novos tickets, interpreta o contexto do problema, aplica regras de diagnóstico e prepara um resumo inicial para acelerar a atuação da equipe técnica.
 
 ## Visão Geral
 
-O objetivo do projeto e transformar o primeiro atendimento em um fluxo mais inteligente:
+O objetivo do projeto é transformar o primeiro atendimento em um fluxo mais inteligente:
 
 - o usuário abre um ticket
-- o `Clipper` executa uma analise automatizada inicial
+- o `Clipper` executa uma análise automatizada inicial
 - o sistema sugere causas prováveis e próximos passos
-- o tecnico humano recebe o caso com mais contexto e menos triagem manual
+- o técnico humano recebe o caso com mais contexto e menos triagem manual
 
-Isso reduz o tempo gasto nas etapas repetitivas e prepara o sistema para evoluir para automacoes mais avancadas no futuro.
+Isso reduz o tempo gasto nas etapas repetitivas e prepara o sistema para evoluir para automações mais avançadas no futuro.
 
 ## O Papel do Clipper
 
-O `Clipper` e o nucleo de automacao da plataforma. Ele foi pensado para atuar antes da triagem humana, ajudando a classificar o chamado e levantar hipoteses iniciais.
+O `Clipper` é o núcleo de automação da plataforma. Ele foi pensado para atuar antes da triagem humana, ajudando a classificar o chamado e levantar hipóteses iniciais.
 
 Responsabilidades esperadas:
 
-- ler tickets de suporte recem-criados
-- executar regras de diagnostico predefinidas
-- produzir um resumo diagnostico inicial
+- ler tickets de suporte recém-criados
+- executar regras de diagnóstico predefinidas
+- produzir um resumo diagnóstico inicial
 - sugerir artigos relacionados da base de conhecimento
 - preparar tickets para triagem humana
 
-## Stack Tecnologica
+## Stack Tecnológica
 
 - Backend: Java 21, Spring Boot, Maven Wrapper, PostgreSQL, API REST
 - Frontend: React, Vite, TypeScript
@@ -37,8 +37,8 @@ Responsabilidades esperadas:
 ## Objetivos do Projeto
 
 - Estrutura inspirada em clean architecture
-- Pacotes modulares por capacidade de negocio
-- Preparado para uma futura camada de automacao centrada no `Clipper`
+- Pacotes modulares por capacidade de negócio
+- Preparado para uma futura camada de automação centrada no `Clipper`
 
 ## Estrutura do Repositório
 
@@ -55,7 +55,7 @@ clipper/
     └── src/
 ```
 
-Este repositorio contem a base atual do projeto, com backend Spring Boot estruturado pelo Spring Initializr e frontend React/Vite separado em `frontend/`.
+Este repositório contém a base atual do projeto, com backend Spring Boot estruturado pelo Spring Initializr e frontend React/Vite separado em `frontend/`.
 
 ## Como Executar o Backend
 

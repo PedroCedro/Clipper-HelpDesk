@@ -33,7 +33,7 @@ export default function Dashboard() {
         ]);
 
         if (!healthResponse.ok || !ticketsResponse.ok) {
-          throw new Error("Nao foi possivel consultar o backend local.");
+          throw new Error("Não foi possível consultar o backend local.");
         }
 
         const [healthData, ticketData] = await Promise.all([

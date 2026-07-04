@@ -20,7 +20,7 @@ type ClipperWidgetProps = {
 const statusLabel: Record<string, string> = {
   NOVO: "Novo",
   ABERTO: "Aberto",
-  EM_ANALISE: "Em analise",
+  EM_ANALISE: "Em análise",
   RESOLVIDO: "Resolvido",
 };
 
@@ -41,18 +41,18 @@ export default function ClipperWidget({
         </div>
         <div className={`widget-pill ${isActive ? "is-active" : "is-idle"}`}>
           <span className="dot" />
-          <span>{isActive ? "API ativa" : "API indisponivel"}</span>
+          <span>{isActive ? "API ativa" : "API indisponível"}</span>
         </div>
       </div>
 
       <p className="widget-copy">
-        O painel abaixo mostra o estado da API e os tickets que ja estao
+        O painel abaixo mostra o estado da API e os tickets que já estão
         prontos para a primeira leitura automatizada.
       </p>
 
       <div className="widget-grid">
         <article className="metric-card">
-          <span className="metric-label">Servico</span>
+          <span className="metric-label">Serviço</span>
           <strong>{health?.service ?? "Aguardando resposta"}</strong>
         </article>
         <article className="metric-card">
@@ -72,7 +72,7 @@ export default function ClipperWidget({
         {isLoading ? (
           <p className="ticket-empty">Buscando tickets no backend...</p>
         ) : tickets.length === 0 ? (
-          <p className="ticket-empty">Nenhum ticket disponivel no momento.</p>
+          <p className="ticket-empty">Nenhum ticket disponível no momento.</p>
         ) : (
           tickets.map((ticket) => (
             <article className="ticket-card" key={ticket.id}>
