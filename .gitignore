@@ -43,6 +43,7 @@ temp.ps1
 
 # Local-only docs (governança/notas que ficam só na máquina)
 *.local
+/local/
 
 # Banco H2 de desenvolvimento (arquivo local, não versionar)
 /data/
