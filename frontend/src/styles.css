@@ -202,6 +202,62 @@ body {
   background: #68d391;
 }
 
+.diagnose-button {
+  margin-top: 14px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 999px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #132238;
+  background: #f1b287;
+  cursor: pointer;
+  transition: transform 0.08s ease, background 0.15s ease;
+}
+
+.diagnose-button:hover:not(:disabled) {
+  background: #f6c6a3;
+}
+
+.diagnose-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.diagnose-error {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #ffd9c5;
+  background: rgba(214, 84, 84, 0.16);
+}
+
+.diagnose-result {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(241, 178, 135, 0.1);
+  border: 1px solid rgba(241, 178, 135, 0.25);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.diagnose-line {
+  margin: 0 0 10px;
+  line-height: 1.5;
+}
+
+.diagnose-line strong {
+  color: #f1b287;
+}
+
+.diagnose-meta {
+  margin: 4px 0 0;
+  font-size: 0.82rem;
+  color: rgba(244, 239, 228, 0.7);
+}
+
 @media (max-width: 640px) {
   .dashboard {
     padding: 24px 16px 48px;
