@@ -1,46 +1,60 @@
 # Clipper
 
-![Clipper Office](docs/clipper-office.png)
+![Clipper](docs/clipper-office.png)
 
-Clipper é um sistema de atendimento projetado para receber chamados de suporte e executar um diagnóstico automatizado inicial antes da intervenção de um técnico humano.
+> Um assistente de clipe que, desta vez, aprendeu a ajudar de verdade.
 
-O assistente de automação se chama `Clipper`. Ele lê novos tickets, interpreta o contexto do problema, aplica regras de diagnóstico e prepara um resumo inicial para acelerar a atuação da equipe técnica.
+Clipper é um sistema de atendimento (helpdesk) projetado para receber chamados de suporte e executar um diagnóstico automatizado inicial antes da intervenção de um técnico humano.
 
-## Visão Geral
+O assistente de automação se chama `Clipper`. Ele lê novos tickets, interpreta o contexto do problema, aplica regras de diagnóstico e — quando necessário — recorre à IA para sugerir causas prováveis e próximos passos, sempre preparando um resumo inicial para acelerar a atuação da equipe técnica.
+
+## Visão geral
 
 O objetivo do projeto é transformar o primeiro atendimento em um fluxo mais inteligente:
 
 - o usuário abre um ticket
-- o `Clipper` executa uma análise automatizada inicial
-- o sistema sugere causas prováveis e próximos passos
+- o `Clipper` executa uma análise automatizada inicial (regras + IA)
+- o sistema sugere causas prováveis e próximos passos, com nível de confiança e a fonte
 - o técnico humano recebe o caso com mais contexto e menos triagem manual
 
 Isso reduz o tempo gasto nas etapas repetitivas e prepara o sistema para evoluir para automações mais avançadas no futuro.
 
-## O Papel do Clipper
+## O papel do Clipper
 
-O `Clipper` é o núcleo de automação da plataforma. Ele foi pensado para atuar antes da triagem humana, ajudando a classificar o chamado e levantar hipóteses iniciais.
+O `Clipper` é o núcleo de automação da plataforma. Ele foi pensado para atuar antes da triagem humana, ajudando a classificar o chamado e a levantar hipóteses iniciais.
 
 Responsabilidades esperadas:
 
 - ler tickets de suporte recém-criados
 - executar regras de diagnóstico predefinidas
-- produzir um resumo diagnóstico inicial
+- recorrer à IA para os casos que as regras não cobrem
+- produzir um resumo diagnóstico inicial, com confiança e fonte
 - sugerir artigos relacionados da base de conhecimento
 - preparar tickets para triagem humana
 
-## Stack Tecnológica
+## Arquitetura
 
-- Backend: Java 21, Spring Boot, Maven Wrapper, PostgreSQL, API REST
+- **Motor híbrido:** regras determinísticas para os casos conhecidos e IA para o restante. O `DiagnosticEngine` atua como orquestrador.
+- **IA atrás de uma interface (`DiagnosticProvider`), sem lock-in de fornecedor.** O provider padrão fala o formato compatível com a API da OpenAI, o que permite trocar de modelo/fornecedor apenas por configuração.
+- **Pacotes modulares por capacidade de negócio** (monólito modular, com costuras para evoluir sem reescrever o núcleo).
+- **Privacidade por princípio:** anonimização de dados sensíveis antes de qualquer chamada externa *(em construção)*.
+
+## Stack tecnológica
+
+- Backend: Java 21, Spring Boot, Maven Wrapper, API REST
 - Frontend: React, Vite, TypeScript
+- Diagnóstico: motor híbrido (regras + IA via provider configurável, compatível com o formato OpenAI por padrão)
+- Persistência: PostgreSQL previsto para integração futura
 
-## Objetivos do Projeto
+## Objetivos do projeto
 
 - Estrutura inspirada em clean architecture
 - Pacotes modulares por capacidade de negócio
-- Preparado para uma futura camada de automação centrada no `Clipper`
+- Motor de IA atrás de interface, sem lock-in de fornecedor
+- Base de conhecimento própria para ancorar o diagnóstico em fontes confiáveis
+- Quando não há base confiável para o caso, sinalizar em vez de arriscar um palpite
 
-## Estrutura do Repositório
+## Estrutura do repositório
 
 ```text
 clipper/
@@ -50,6 +64,9 @@ clipper/
 ├── pom.xml
 ├── src/
 │   └── main/java/br/com/infocedro/clipper
+│       ├── clipper/      # motor de diagnóstico e providers
+│       ├── ticket/       # chamados (API, serviço, repositório)
+│       └── knowledge/    # base de conhecimento
 └── frontend/
     ├── package.json
     └── src/
@@ -57,7 +74,7 @@ clipper/
 
 Este repositório contém a base atual do projeto, com backend Spring Boot estruturado pelo Spring Initializr e frontend React/Vite separado em `frontend/`.
 
-## Como Executar o Backend
+## Como executar o backend
 
 Requisitos:
 
@@ -74,11 +91,13 @@ Execução:
 Endpoints iniciais:
 
 ```text
-GET /api/health
-GET /api/tickets
+GET  /api/health
+GET  /api/tickets
+POST /api/tickets
+POST /api/tickets/{id}/diagnose
 ```
 
-## Como Executar o Frontend
+## Como executar o frontend
 
 Requisitos:
 
@@ -98,8 +117,9 @@ Observações de desenvolvimento local:
 - o Vite faz proxy automático de `/api` para o backend durante `npm run dev`
 - se preferir chamar a API Spring diretamente no navegador, o backend libera CORS para `http://localhost:5173`
 
-## Estado Atual
+## Estado atual
 
-- o backend novo roda na raiz do projeto com `pom.xml`, `src/` e `mvnw.cmd`
+- o backend roda na raiz do projeto com `pom.xml`, `src/` e `mvnw.cmd`
 - o frontend foi consolidado em `frontend/`
+- o diagnóstico já roda via provider de IA configurável, combinado com as regras determinísticas
 - a pasta antiga `Clipper-HelpDesk` foi descontinuada como base principal
