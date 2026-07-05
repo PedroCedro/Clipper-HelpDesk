@@ -3,6 +3,7 @@ package br.com.infocedro.clipper.clipper;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -17,6 +18,7 @@ import br.com.infocedro.clipper.config.AiProperties;
 // Mesma API serve OpenAI, Groq, DeepSeek, OpenRouter, Ollama — troca base_url+key+model.
 // MVP: GPT-4o-mini. Usa o RestClient do Spring (sem SDK externo).
 @Component
+@ConditionalOnProperty(name = "clipper.ai.provider", havingValue = "openai", matchIfMissing = true)
 public class OpenAiCompatibleProvider implements DiagnosticProvider {
 
     private static final String SYSTEM_PROMPT = """
