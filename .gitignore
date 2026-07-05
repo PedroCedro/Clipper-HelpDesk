@@ -46,3 +46,10 @@ temp.ps1
 
 # Banco H2 de desenvolvimento (arquivo local, não versionar)
 /data/
+
+# Artefatos locais do collector TOTVS Winthor
+/src/main/java/br/com/infocedro/clipper/collector/*.jsonl
+/src/main/java/br/com/infocedro/clipper/collector/*.mv.db
+/src/main/java/br/com/infocedro/clipper/collector/*.trace.db
+/src/main/java/br/com/infocedro/clipper/collector/*.lock.db
+/src/main/java/br/com/infocedro/clipper/collector/crawl-summary.json
