@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Clipper">
+  <defs>
+    <linearGradient id="clipper-teal" x1="8" y1="9" x2="40" y2="39" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0F7D74"/>
+      <stop offset="1" stop-color="#0B5E57"/>
+    </linearGradient>
+  </defs>
+  <!-- o chamado (ticket) -->
+  <rect x="4" y="9" width="40" height="30" rx="9" fill="url(#clipper-teal)"/>
+  <!-- pulso / sinal de vida -->
+  <polyline points="12.5 24 17.7 24 21.1 17.5 25.7 31 28.6 24 35.5 24"
+    fill="none" stroke="#FFFFFF" stroke-width="3.4"
+    stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
