@@ -1,0 +1,81 @@
+# Base de conhecimento curada à mão (seed do MVP).
+# Fonte: Central de Atendimento TOTVS (docs públicos da Linha WinThor).
+# Tema deste seed: NFC-e em contingência. Os artigos 1443 e 1360 desembocam
+# no hub 2097 (processar contingência).
+
+- title: "Cupom fiscal não aparece na rotina 1443"
+  keywords: "1443, cupom fiscal, resumo do dia, simples remessa, nfc-e, nfce, vendas presas, servidor de faturamento, 2097, reprocessar cupom, rca, codusur, 131"
+  sourceUrl: "https://centraldeatendimento.totvs.com/hc/pt-br/articles/1500000413742"
+  content: |
+    Sintoma:
+    Cupons fiscais emitidos no caixa não aparecem na rotina 1443 para emissão
+    de Resumo do dia (IPI) ou Simples Remessa (IPI).
+    Ambiente: Winthor Varejo, a partir da versão 29.
+
+    Causa provável:
+    Vendas ainda não processadas / presas nos caixas (não subiram para a base
+    do Winthor), cupons pendentes de reprocessamento, ou falta de permissão de
+    RCA do usuário que pesquisa a nota.
+
+    Próximos passos:
+    1. No Gerenciamento de Vendas, abra o Servidor de Faturamento e verifique
+       se há vendas presas nos caixas.
+    2. Se o detalhamento do caixa não apresentar 100% das vendas, siga o
+       procedimento "WINT - O que fazer para subir suas vendas".
+    3. Com as vendas 100% no gerenciamento, acesse a rotina 2097 e reprocesse
+       os cupons pendentes (ver "WINT - Como auditar NFC-e na rotina 2097").
+    4. Valide o processamento nas rotinas 2094, 2097 e 143.
+    5. Acesse a rotina 131 com o usuário em questão e verifique a permissão de
+       RCA da opção 7. O Codusur (RCA) da nota deve estar permitido para esse
+       usuário.
+
+- title: "NF-e não consta na base da SEFAZ ao devolver na rotina 1360"
+  keywords: "1360, devolução, devolucao, nf-e não consta, nf-e nao consta, sefaz, nfc-e, nfce, contingência, contingencia, 2097, a enviar, recebimento de mercadoria"
+  sourceUrl: "https://centraldeatendimento.totvs.com/hc/pt-br/articles/4411288885271"
+  content: |
+    Sintoma:
+    Ao realizar uma devolução pela rotina 1360, aparece a mensagem
+    "NF-e não consta na base de dados da SEFAZ".
+    Ambiente: Winthor Distribuição, módulo 13 (Recebimento de Mercadoria),
+    a partir da versão 30.
+
+    Causa provável:
+    A NFC-e ainda está em contingência (situação "A Enviar") — ou seja, não
+    foi transmitida/validada junto à SEFAZ. Sem constar na base da SEFAZ, a
+    devolução na 1360 não encontra a nota.
+
+    Próximos passos:
+    1. Acesse a rotina 2097, aba Contingência, informando os filtros de acordo
+       com o cupom de devolução.
+    2. Selecione a situação "NFC-e A Enviar".
+    3. Marque e processe a NFC-e para ser validada junto à SEFAZ.
+    4. Retorne à rotina 1360 e refaça o processo.
+
+- title: "Como processar cupom fiscal em contingência (rotina 2097)"
+  keywords: "2097, auditoria nfc-e, contingência, contingencia, cupom fiscal, processar, filial, caixa, rejeitadas, utilizar xml original, dpec, fs-da, cotepe, 168 horas, 24 horas, sefaz"
+  sourceUrl: "https://centraldeatendimento.totvs.com/hc/pt-br/articles/360043422693"
+  content: |
+    Sintoma:
+    NFC-e / cupons emitidos em contingência precisam ser processados e
+    transmitidos à SEFAZ para constarem na base e aparecerem nas demais
+    rotinas (ex.: 1443, 1360).
+    Ambiente: Winthor Varejo, a partir da versão 29.
+
+    Causa provável:
+    NFC-e emitida em contingência (offline, DPEC ou FS-DA) ainda não foi
+    transmitida/validada junto à SEFAZ.
+
+    Próximos passos:
+    1. Acesse a rotina 2097 - Auditoria NFC-e e selecione a aba Contingências.
+    2. Preencha os campos Filial e Caixa conforme necessidade.
+    3. Selecione o status da nota a pesquisar: Aprovadas, Reprovadas ou Enviadas.
+    4. Marque "Rejeitadas a mais de 24 horas" para exibir notas rejeitadas há
+       mais de 24h.
+    5. Clique em Pesquisar e depois em Processar.
+    6. Se alguma nota foi editada após rejeição, desmarque a flag "Utilizar XML
+       original no envio" para reprocessar gerando um novo XML.
+
+    Observação legal (Ato COTEPE 33/08):
+    - Contingência DPEC ou FS-DA: transmitir em até 168 horas após a emissão.
+    - Contingência offline: até 24 horas após a emissão. Fora do prazo, a SEFAZ
+      pode aplicar penalidade.
