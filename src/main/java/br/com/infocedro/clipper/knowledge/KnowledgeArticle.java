@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+// Artigo simples da base de conhecimento interna usada para apoiar diagnósticos.
 @Entity
 public class KnowledgeArticle {
 

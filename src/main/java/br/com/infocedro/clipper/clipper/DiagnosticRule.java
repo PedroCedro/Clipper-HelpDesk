@@ -1,5 +1,7 @@
 package br.com.infocedro.clipper.clipper;
 
+// Esqueleto para regras determinísticas de diagnóstico.
+// A ideia é cobrir casos conhecidos antes de recorrer ao LLM.
 public class DiagnosticRule {
 
     private String name;

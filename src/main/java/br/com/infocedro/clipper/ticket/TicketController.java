@@ -12,7 +12,6 @@ import br.com.infocedro.clipper.clipper.ClipperAgent;
 import br.com.infocedro.clipper.clipper.DiagnosticRequest;
 import br.com.infocedro.clipper.clipper.DiagnosticResult;
 
-
 @RestController
 @RequestMapping("/api")
 public class TicketController {
@@ -21,9 +20,9 @@ public class TicketController {
     private final ClipperAgent clipperAgent;
 
     public TicketController(TicketService ticketService, ClipperAgent clipperAgent) {
-    this.ticketService = ticketService;
-    this.clipperAgent = clipperAgent;
-   }
+        this.ticketService = ticketService;
+        this.clipperAgent = clipperAgent;
+    }
 
     @GetMapping("/health")
     public Map<String, String> health() {
@@ -42,16 +41,15 @@ public class TicketController {
 
     @PostMapping("/tickets/{id}/diagnose")
     public Map<String, DiagnosticResult> diagnose(@PathVariable Long id) {
-    // 1) busca o ticket (módulo ticket)
-    Ticket ticket = ticketService.findById(id);
+        // 1) busca o ticket (módulo ticket)
+        Ticket ticket = ticketService.findById(id);
 
-    // 2) TRADUÇÃO: Ticket -> DiagnosticRequest. É AQUI, na borda, que os dois mundos se encontram.
-    DiagnosticRequest request = new DiagnosticRequest(ticket.getTitle(), ticket.getDescription());
+        // 2) TRADUÇÃO: Ticket -> DiagnosticRequest. É AQUI, na borda, que os dois mundos se encontram.
+        DiagnosticRequest request = new DiagnosticRequest(ticket.getTitle(), ticket.getDescription());
 
-    // 3) chama o motor (módulo clipper) só com o contrato
-    DiagnosticResult diagnosis = clipperAgent.analyze(request);
+        // 3) chama o motor (módulo clipper) só com o contrato
+        DiagnosticResult diagnosis = clipperAgent.analyze(request);
 
-    return Map.of("diagnosis", diagnosis);
-}
-
+        return Map.of("diagnosis", diagnosis);
+    }
 }

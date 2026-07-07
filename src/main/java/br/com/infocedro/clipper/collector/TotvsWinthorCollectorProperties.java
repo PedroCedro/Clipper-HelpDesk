@@ -4,6 +4,8 @@ import java.nio.file.Path;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+// Opções do crawler TOTVS. Limites iguais a 0 significam "sem limite", útil
+// para alternar entre testes pequenos e coleta completa sem mudar código.
 @ConfigurationProperties(prefix = "clipper.collector.totvs-winthor")
 public class TotvsWinthorCollectorProperties {
 

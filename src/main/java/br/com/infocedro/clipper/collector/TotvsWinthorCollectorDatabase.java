@@ -14,6 +14,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
+// Persistência opcional do crawler em H2. Os JSONL continuam sendo gerados;
+// o banco facilita consultas locais e reexecuções incrementais por MERGE.
 @Service
 public class TotvsWinthorCollectorDatabase {
 
@@ -51,6 +53,7 @@ public class TotvsWinthorCollectorDatabase {
         }
 
         private static DatabaseSession disabled() {
+            // Null Object: o crawler pode chamar upsert/close sem espalhar ifs.
             return new DatabaseSession(null, null);
         }
 

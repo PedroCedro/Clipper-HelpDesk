@@ -28,6 +28,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
+// Coletor da Central TOTVS/WinThor via API pública do Help Center.
+// Saída dupla: JSONL para versionar/inspecionar e H2 opcional para consultas.
 @Service
 public class TotvsWinthorCrawler {
 
@@ -67,6 +69,7 @@ public class TotvsWinthorCrawler {
         try (BufferedWriter sectionWriter = Files.newBufferedWriter(sectionsFile, StandardCharsets.UTF_8);
              BufferedWriter articleWriter = Files.newBufferedWriter(articlesFile, StandardCharsets.UTF_8);
              TotvsWinthorCollectorDatabase.DatabaseSession database = collectorDatabase.open(properties)) {
+            // Varre a árvore em largura para manter a coleta previsível e respeitar limites.
             while (!pendingSections.isEmpty()) {
                 if (isLimitReached(sectionCount, properties.getMaxSections())) {
                     break;
@@ -215,6 +218,7 @@ public class TotvsWinthorCrawler {
         List<JsonNode> categorySections = loadCategorySections(properties, rootSection.categoryId());
         Map<Long, List<JsonNode>> rawChildren = new LinkedHashMap<>();
 
+        // A API lista seções por categoria; reconstruímos a árvore usando parent_section_id.
         for (JsonNode section : categorySections) {
             Long parentId = longOrNull(section.path("parent_section_id"));
             if (parentId == null) {
@@ -312,6 +316,7 @@ public class TotvsWinthorCrawler {
             return "";
         }
 
+        // Conversão leve: suficiente para indexar texto limpo sem depender de parser HTML.
         String text = html
                 .replaceAll("(?i)<br\\s*/?>", "\n")
                 .replaceAll("(?i)</p>", "\n")

@@ -5,6 +5,8 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
+// Runner de coleta sob demanda. Quando habilitado por configuração, executa o
+// crawler uma vez e encerra o contexto para não manter a API web rodando à toa.
 @Component
 public class TotvsWinthorCrawlerRunner implements ApplicationRunner {
 

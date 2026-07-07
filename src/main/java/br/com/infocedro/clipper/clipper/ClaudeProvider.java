@@ -79,6 +79,8 @@ public class ClaudeProvider implements DiagnosticProvider {
                 + "Descrição: " + request.description();
     }
 
+    // Diferente do provider OpenAI-compatível, aqui o SDK já entrega o texto
+    // final do assistente; por isso só precisamos parsear o JSON interno.
     private DiagnosticResult parse(String content) {
         try {
             JsonNode diagnosis = objectMapper.readTree(content);
