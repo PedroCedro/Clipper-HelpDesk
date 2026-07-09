@@ -31,12 +31,17 @@ O formato segue o padrão Keep a Changelog.
 - `KnowledgeSearch` passa a classificar a força do match (`KnowledgeMatch`): 2+ tokens = forte (lookup puro), 1 token = fraco (apoio pra IA) — antes o match de 1 token era descartado
 - `DiagnosticProvider.diagnose` passa a aceitar material de apoio opcional; os dois providers (OpenAI-compatível e Claude) incluem o artigo no prompt quando presente
 - frontend reconstruído como console: `Dashboard`/`ClipperWidget` dão lugar a `Console` + componentes pequenos (Sidebar, Topbar, TicketQueue, TicketDetail, ClipperPanel, NewTicketForm); ações do painel nascem desabilitadas até existirem endpoints (rodada B3)
+- `GET /api/tickets` passa a devolver `TicketResponse` (DTO de borda) com o resumo do último diagnóstico (estado do gate + confiança) — a fonte da tag de IA na fila
+- `ClipperAgent` vira o caso de uso do diagnóstico: analisa e persiste (upsert); o `DiagnosticEngine` continua puro, sem conhecer banco
 - teto de confiança por estado do gate: a autoavaliação da IA é cortada em 0.9 no estado `apoiado` e 0.5 no `sem-base` (só artigo curado verbatim vale 1.0); teto, não piso — autoavaliação baixa é respeitada
 - gate de grounding estruturado na resposta da API (`grounding`: estado `ANCORADO`/`APOIADO`/`SEM_BASE` + título/URL do artigo + modelo) — a string `source` vira leitura humana/log, a UI não a parseia
 - widget do frontend renderiza o gate: selo por estado (rótulos neutros), barra de confiança e link "ver fonte oficial" quando há artigo de base
 - console do agente (3 zonas): sidebar com marca ticket+pulso, fila master-detail de tickets, detalhe com painel "Diagnóstico do Clipper" (faixa do gate por estado, confiança, fonte, legenda explicando os selos)
 - tema claro/escuro/sistema com tokens de design (persistido em localStorage)
 - busca client-side na fila (nº, título, descrição) e formulário mínimo de novo ticket (alimenta a demo sem curl)
+- diagnóstico persistido por ticket (`Diagnosis`, uma linha por ticket — rediagnosticar substitui); reabrir ticket não gasta IA de novo
+- `GET /api/tickets/{id}/diagnosis` devolve o último diagnóstico salvo (204 quando o ticket nunca foi diagnosticado)
+- ticket ganha `createdAt` (carimbado na inserção), `priority`, `requester` e `routine`
 - textos pt-br (README, CHANGELOG, UI do frontend e comentários) passam a usar acentuação completa
 
 ### Fixed
