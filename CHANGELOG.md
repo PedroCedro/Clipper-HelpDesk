@@ -30,9 +30,13 @@ O formato segue o padrão Keep a Changelog.
 - `DiagnosticEngine` aplica fluxo híbrido: consulta a base de conhecimento antes da IA; com match forte devolve o artigo curado (`source` = `ancorado: ...`, sem chamada de IA); sem match cai na IA e marca `source` = `sem-base: ...`
 - `KnowledgeSearch` passa a classificar a força do match (`KnowledgeMatch`): 2+ tokens = forte (lookup puro), 1 token = fraco (apoio pra IA) — antes o match de 1 token era descartado
 - `DiagnosticProvider.diagnose` passa a aceitar material de apoio opcional; os dois providers (OpenAI-compatível e Claude) incluem o artigo no prompt quando presente
+- frontend reconstruído como console: `Dashboard`/`ClipperWidget` dão lugar a `Console` + componentes pequenos (Sidebar, Topbar, TicketQueue, TicketDetail, ClipperPanel, NewTicketForm); ações do painel nascem desabilitadas até existirem endpoints (rodada B3)
 - teto de confiança por estado do gate: a autoavaliação da IA é cortada em 0.9 no estado `apoiado` e 0.5 no `sem-base` (só artigo curado verbatim vale 1.0); teto, não piso — autoavaliação baixa é respeitada
 - gate de grounding estruturado na resposta da API (`grounding`: estado `ANCORADO`/`APOIADO`/`SEM_BASE` + título/URL do artigo + modelo) — a string `source` vira leitura humana/log, a UI não a parseia
 - widget do frontend renderiza o gate: selo por estado (rótulos neutros), barra de confiança e link "ver fonte oficial" quando há artigo de base
+- console do agente (3 zonas): sidebar com marca ticket+pulso, fila master-detail de tickets, detalhe com painel "Diagnóstico do Clipper" (faixa do gate por estado, confiança, fonte, legenda explicando os selos)
+- tema claro/escuro/sistema com tokens de design (persistido em localStorage)
+- busca client-side na fila (nº, título, descrição) e formulário mínimo de novo ticket (alimenta a demo sem curl)
 - textos pt-br (README, CHANGELOG, UI do frontend e comentários) passam a usar acentuação completa
 
 ### Fixed

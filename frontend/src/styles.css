@@ -1,347 +1,409 @@
+/* =============================================================
+   Tokens de design do console — vêm do mockup aprovado (norte
+   visual). Tudo em variável CSS de propósito: trocar tema é trocar
+   token, nenhum componente conhece cor "na unha".
+   ============================================================= */
 :root {
-  color: #132238;
-  background:
-    radial-gradient(circle at top, rgba(228, 124, 54, 0.16), transparent 28%),
-    linear-gradient(180deg, #f4efe4 0%, #dbe7ef 100%);
-  font-family: Georgia, "Times New Roman", serif;
+  --font-ui: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Cascadia Code", "Cascadia Mono", ui-monospace, "SF Mono", Consolas, "Liberation Mono", monospace;
+
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --surface-2: #f5f8fa;
+  --border: #e1e6eb;
+  --border-strong: #cdd5dd;
+  --text: #16202a;
+  --text-muted: #5c6873;
+  --text-faint: #8a96a1;
+
+  /* Teal "diagnóstico": a cor da marca (ticket + pulso). */
+  --accent: #0f7d74;
+  --accent-strong: #0b5e57;
+  --accent-soft: #e1f1ef;
+  --on-accent: #ffffff;
+
+  /* Pares semânticos (cor forte + fundo suave) — são eles que dão
+     significado ao gate: ok=ancorado, info=apoiado, warn=sem-base. */
+  --ok: #1e9e5a;   --ok-soft: #e4f5ea;
+  --warn: #b5730a; --warn-soft: #fbefd8;
+  --crit: #ce443b; --crit-soft: #fbe7e5;
+  --info: #2e6fc0; --info-soft: #e4eef9;
+
+  --shadow: 0 1px 2px rgba(16, 32, 42, 0.06), 0 8px 24px rgba(16, 32, 42, 0.06);
+  --radius: 10px;
 }
 
-* {
-  box-sizing: border-box;
+/* Tema escuro pelo SISTEMA (quando o usuário não forçou nada). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1316;
+    --surface: #141c20;
+    --surface-2: #1a242a;
+    --border: #243036;
+    --border-strong: #31404a;
+    --text: #e7ecef;
+    --text-muted: #95a2ab;
+    --text-faint: #69767f;
+
+    --accent: #26b7a9;
+    --accent-strong: #3ecbbd;
+    --accent-soft: #12312e;
+    --on-accent: #04201d;
+
+    --ok: #3fbe75;   --ok-soft: #12301f;
+    --warn: #d9973a; --warn-soft: #33270f;
+    --crit: #e4685e; --crit-soft: #361b19;
+    --info: #5b9be0; --info-soft: #14273b;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
+  }
 }
 
-body {
-  margin: 0;
-  min-width: 320px;
-  color: #132238;
-  background: transparent;
+/* Override explícito do usuário (seletor ☀/☾): data-theme no <html>
+   vence o sistema nos DOIS sentidos — por isso os dois blocos existem
+   mesmo repetindo valores. */
+:root[data-theme="light"] {
+  --bg: #eef1f4; --surface: #ffffff; --surface-2: #f5f8fa;
+  --border: #e1e6eb; --border-strong: #cdd5dd;
+  --text: #16202a; --text-muted: #5c6873; --text-faint: #8a96a1;
+  --accent: #0f7d74; --accent-strong: #0b5e57; --accent-soft: #e1f1ef; --on-accent: #ffffff;
+  --ok: #1e9e5a; --ok-soft: #e4f5ea; --warn: #b5730a; --warn-soft: #fbefd8;
+  --crit: #ce443b; --crit-soft: #fbe7e5; --info: #2e6fc0; --info-soft: #e4eef9;
+  --shadow: 0 1px 2px rgba(16, 32, 42, 0.06), 0 8px 24px rgba(16, 32, 42, 0.06);
+}
+:root[data-theme="dark"] {
+  --bg: #0d1316; --surface: #141c20; --surface-2: #1a242a;
+  --border: #243036; --border-strong: #31404a;
+  --text: #e7ecef; --text-muted: #95a2ab; --text-faint: #69767f;
+  --accent: #26b7a9; --accent-strong: #3ecbbd; --accent-soft: #12312e; --on-accent: #04201d;
+  --ok: #3fbe75; --ok-soft: #12301f; --warn: #d9973a; --warn-soft: #33270f;
+  --crit: #e4685e; --crit-soft: #361b19; --info: #5b9be0; --info-soft: #14273b;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
-#root {
-  min-height: 100vh;
-}
+* { box-sizing: border-box; }
+body { margin: 0; }
+#root { min-height: 100vh; }
 
-.dashboard {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 48px 24px 72px;
-}
-
-.hero {
-  padding: 40px;
-  border-radius: 24px;
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow: 0 20px 50px rgba(19, 34, 56, 0.08);
-  backdrop-filter: blur(10px);
-}
-
-.eyebrow {
-  margin: 0 0 12px;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #8a4b2a;
-}
-
-.hero h1 {
-  margin: 0 0 16px;
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 1.05;
-}
-
-.lead {
-  margin: 0;
-  max-width: 640px;
-  font-size: 1.05rem;
-  line-height: 1.6;
-}
-
-.widget {
-  margin-top: 24px;
-  padding: 28px;
-  border-radius: 20px;
-  background: #132238;
-  color: #f4efe4;
-  box-shadow: 0 24px 60px rgba(19, 34, 56, 0.22);
-}
-
-.widget-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.widget-kicker {
-  margin: 0 0 8px;
-  color: #f1b287;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-size: 0.78rem;
-  font-weight: 700;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.widget h2,
-.ticket-list-header h3,
-.ticket-card h4 {
-  margin-top: 0;
-}
-
-.widget-copy,
-.ticket-card p,
-.ticket-list-header span,
-.metric-label,
-.widget-error,
-.ticket-empty,
-.widget-pill {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.widget-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-}
-
-.widget-pill.is-active {
-  background: rgba(84, 214, 130, 0.14);
-}
-
-.widget-pill.is-idle {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.widget-grid {
+/* ---------- Estrutura geral: sidebar fixa + workspace ---------- */
+.app {
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
+  height: 100vh;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 24px;
+  grid-template-columns: 236px 1fr;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
 }
 
-.metric-card {
-  padding: 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.07);
-}
-
-.metric-card strong {
-  display: block;
-  margin-top: 10px;
-  font-size: 1.2rem;
-}
-
-.metric-label {
-  color: rgba(244, 239, 228, 0.75);
-  font-size: 0.88rem;
-}
-
-.widget-error {
-  margin: 18px 0 0;
-  padding: 14px 16px;
-  border-radius: 14px;
-  color: #ffd9c5;
-  background: rgba(214, 84, 84, 0.16);
-}
-
-.ticket-list {
-  margin-top: 24px;
-}
-
-.ticket-list-header {
+/* ---------- Sidebar ---------- */
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-  margin-bottom: 14px;
+  flex-direction: column;
+  min-height: 0;
 }
 
-.ticket-card {
-  padding: 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.06);
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.brand-mark {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: linear-gradient(150deg, var(--accent), var(--accent-strong));
+  display: grid; place-items: center;
+  color: var(--on-accent);
+}
+.brand-mark svg { width: 18px; height: 18px; }
+.brand-name { font-weight: 650; letter-spacing: 0.2px; }
+.brand-sub { font-size: 11px; color: var(--text-faint); margin-top: -2px; }
+
+.nav { padding: 12px 10px; overflow-y: auto; flex: 1; min-height: 0; }
+.nav-label {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-faint); padding: 12px 10px 6px;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 8px;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  user-select: none;
+}
+.nav-item.active { background: var(--accent-soft); color: var(--accent-strong); font-weight: 600; }
+/* Itens ainda sem tela por trás ficam apagados de propósito — nada de
+   navegação que não leva a lugar nenhum fingindo que funciona. */
+.nav-item.soon { opacity: 0.45; cursor: default; }
+.nav-item .ico { width: 16px; text-align: center; opacity: 0.85; }
+.nav-item .count {
+  margin-left: auto; font-family: var(--font-mono); font-size: 11.5px;
+  color: var(--text-faint); background: var(--surface-2);
+  padding: 1px 7px; border-radius: 999px;
+}
+.nav-item.active .count { color: var(--accent-strong); background: transparent; }
+
+.user {
+  border-top: 1px solid var(--border);
+  padding: 12px 14px; display: flex; align-items: center; gap: 10px;
+}
+.avatar {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--info-soft); color: var(--info);
+  display: grid; place-items: center; font-weight: 650; font-size: 12px;
+}
+.user-name { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 11px; color: var(--text-faint); }
+
+/* ---------- Workspace: topbar + painéis ---------- */
+.workspace { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+
+.topbar {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.page-title { font-size: 16px; font-weight: 650; white-space: nowrap; }
+.page-count { font-size: 12px; color: var(--text-faint); font-family: var(--font-mono); }
+
+.search {
+  flex: 1; max-width: 420px;
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 11px; color: var(--text-faint);
+}
+.search input {
+  border: 0; background: transparent; outline: none;
+  color: var(--text); font: inherit; width: 100%;
+}
+.search input::placeholder { color: var(--text-faint); }
+
+.spacer { flex: 1; }
+
+/* Seletor de tema em 3 posições (claro/escuro/sistema). */
+.seg {
+  display: inline-flex; background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 8px; padding: 2px;
+}
+.seg button {
+  border: 0; background: transparent; color: var(--text-muted);
+  font: inherit; font-size: 12.5px; padding: 5px 11px; border-radius: 6px;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.seg button.on { background: var(--surface); color: var(--text); box-shadow: var(--shadow); font-weight: 600; }
+
+.btn-primary {
+  border: 0; background: var(--accent); color: var(--on-accent);
+  font: inherit; font-weight: 600; font-size: 13px;
+  padding: 8px 14px; border-radius: 8px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+}
+.btn-primary:hover:not(:disabled) { background: var(--accent-strong); }
+.btn-primary:disabled { opacity: 0.55; cursor: default; }
+
+.btn-ghost {
+  border: 1px solid var(--border-strong); background: transparent; color: var(--text);
+  font: inherit; font-size: 13px; font-weight: 550; padding: 8px 14px; border-radius: 8px; cursor: pointer;
+}
+.btn-ghost:hover:not(:disabled) { background: var(--surface-2); }
+.btn-ghost:disabled { opacity: 0.55; cursor: default; }
+
+/* Fila | detalhe: a fila levemente maior, como no mockup. */
+.panes { flex: 1; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); min-height: 0; }
+
+/* ---------- Fila ---------- */
+.queue { overflow-y: auto; border-right: 1px solid var(--border); min-height: 0; }
+
+.queue-row {
+  display: grid;
+  /* 1ª coluna reservada pra barra de prioridade (entra na F2, quando o
+     Ticket tiver priority) — o grid já nasce com o lugar dela. */
+  grid-template-columns: 4px 58px 1fr auto;
+  gap: 12px; align-items: center;
+  width: 100%;
+  padding: 12px 18px 12px 0;
+  border: 0; border-bottom: 1px solid var(--border);
+  background: transparent; color: inherit; font: inherit; text-align: left;
+  cursor: pointer; position: relative;
+}
+.queue-row:hover { background: var(--surface-2); }
+.queue-row.sel { background: var(--accent-soft); }
+.queue-row.sel::after {
+  content: ""; position: absolute; right: 0; top: 0; bottom: 0; width: 2px; background: var(--accent);
+}
+.tid { font-family: var(--font-mono); font-size: 12.5px; color: var(--text-faint); }
+.q-main { min-width: 0; }
+.q-title {
+  font-weight: 600; font-size: 13.5px; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.q-sub {
+  font-size: 12px; color: var(--text-muted); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.q-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+
+.queue-empty { padding: 24px 20px; color: var(--text-muted); font-size: 13px; }
+.queue-error {
+  margin: 14px 18px; padding: 12px 14px; border-radius: 8px;
+  background: var(--crit-soft); color: var(--crit); font-size: 13px;
 }
 
-.ticket-card + .ticket-card {
-  margin-top: 14px;
+/* Badge de status do ticket (Novo/Em análise/Resolvido). */
+.badge {
+  font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px;
+  display: inline-flex; align-items: center; gap: 5px; white-space: nowrap;
+}
+.badge .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.b-analise { background: var(--warn-soft); color: var(--warn); }
+.b-novo { background: var(--info-soft); color: var(--info); }
+.b-resolvido { background: var(--ok-soft); color: var(--ok); }
+.b-neutro { background: var(--surface-2); color: var(--text-muted); }
+
+/* ---------- Formulário de novo ticket ---------- */
+/* Mínimo de propósito: existe pra alimentar a demo sem curl. O intake
+   de verdade (portal/zap) é outra superfície, outra fase. */
+.new-ticket {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-2);
+  display: grid; gap: 8px;
+}
+.new-ticket input, .new-ticket textarea {
+  border: 1px solid var(--border-strong); border-radius: 8px;
+  background: var(--surface); color: var(--text);
+  font: inherit; font-size: 13px; padding: 8px 11px; outline: none;
+  resize: vertical;
+}
+.new-ticket input:focus, .new-ticket textarea:focus { border-color: var(--accent); }
+.new-ticket-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.new-ticket-error {
+  margin: 0; padding: 10px 12px; border-radius: 8px;
+  background: var(--crit-soft); color: var(--crit); font-size: 12.5px;
 }
 
-.ticket-card-header {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
+/* ---------- Detalhe ---------- */
+.detail { overflow-y: auto; min-height: 0; padding: 22px 24px 40px; }
+.d-eyebrow {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-faint); font-family: var(--font-mono);
+}
+.d-title { font-size: 20px; font-weight: 660; margin: 6px 0 12px; text-wrap: balance; }
+.d-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+
+.section-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--text-faint); margin: 0 0 8px;
+}
+.desc {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px; font-size: 13.5px;
+  color: var(--text-muted); margin-bottom: 22px;
+  white-space: pre-line; /* descrição do solicitante pode ter quebras */
 }
 
-.ticket-badge {
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #132238;
-  background: #f1b287;
-}
+.detail-empty { padding: 40px 24px; color: var(--text-faint); font-size: 13.5px; }
 
-.ticket-empty {
-  margin: 0;
-  padding: 18px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: #68d391;
-}
-
-.diagnose-button {
-  margin-top: 14px;
-  padding: 10px 16px;
-  border: none;
-  border-radius: 999px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  font-weight: 700;
-  font-size: 0.85rem;
-  color: #132238;
-  background: #f1b287;
-  cursor: pointer;
-  transition: transform 0.08s ease, background 0.15s ease;
-}
-
-.diagnose-button:hover:not(:disabled) {
-  background: #f6c6a3;
-}
-
-.diagnose-button:disabled {
-  opacity: 0.6;
-  cursor: default;
-}
-
-.diagnose-error {
-  margin: 12px 0 0;
-  padding: 12px 14px;
-  border-radius: 12px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #ffd9c5;
-  background: rgba(214, 84, 84, 0.16);
-}
-
-.diagnose-result {
-  margin-top: 14px;
-  padding: 16px;
-  border-radius: 14px;
-  background: rgba(241, 178, 135, 0.1);
-  border: 1px solid rgba(241, 178, 135, 0.25);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-}
-
-/* Selo do gate de grounding: linha com o selo à esquerda e o percentual de
-   confiança à direita — a origem da resposta é a primeira leitura do técnico. */
-.diagnose-gate {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.gate-badge {
-  padding: 6px 12px;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-/* Verde = ancorado (curado oficial, sem IA). */
-.gate-badge.is-anchored {
-  color: #0f3d26;
-  background: rgba(104, 211, 145, 0.85);
-}
-
-/* Laranja = apoiado (IA com lastro em artigo curado). */
-.gate-badge.is-supported {
-  color: #132238;
-  background: rgba(241, 178, 135, 0.85);
-}
-
-/* Neutro apagado = sem base (só IA, tratar com desconfiança). */
-.gate-badge.is-ungrounded {
-  color: rgba(244, 239, 228, 0.85);
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.22);
-}
-
-.gate-confidence {
-  font-size: 1.05rem;
-  font-weight: 700;
-}
-
-.confidence-bar {
-  height: 6px;
-  margin-bottom: 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
+/* ---------- Painel "Diagnóstico do Clipper" ---------- */
+.clipper {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: var(--shadow);
   overflow: hidden;
 }
+.clipper-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 13px 16px; border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--accent-soft), transparent);
+}
+.clipper-mark {
+  width: 22px; height: 22px; border-radius: 6px;
+  background: linear-gradient(150deg, var(--accent), var(--accent-strong));
+  color: var(--on-accent); display: grid; place-items: center; font-size: 12px; font-weight: 700;
+}
+.clipper-head h3 { margin: 0; font-size: 14px; font-weight: 650; }
+.clipper-body { padding: 16px; }
 
-.confidence-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #f1b287, #68d391);
+/* Faixa do gate: fundo acompanha o estado — verde ancorado, azul
+   apoiado, âmbar sem-base. O estado APOIADO não existia no mockup
+   (nasceu no backend depois); o par info/azul é o meio-termo natural
+   entre o verde do curado e o âmbar do sem lastro. */
+.grounding {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 11px 13px; border-radius: 8px;
+  border: 1px solid transparent;
+  margin-bottom: 16px;
+}
+.grounding.g-ancorado { background: var(--ok-soft); }
+.grounding.g-apoiado { background: var(--info-soft); }
+.grounding.g-sem-base { background: var(--warn-soft); }
+
+.src-chip {
+  font-size: 11.5px; font-weight: 700;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+.src-chip .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.g-ancorado .src-chip { color: var(--ok); }
+.g-apoiado .src-chip { color: var(--info); }
+.g-sem-base .src-chip { color: var(--warn); }
+
+.src-link { font-size: 13px; color: var(--text); text-decoration: none; border-bottom: 1px solid var(--border-strong); }
+.src-link:hover { border-color: var(--accent); color: var(--accent-strong); }
+.src-model { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+
+.conf { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.conf-num { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--text); }
+.conf-bar { width: 84px; height: 6px; border-radius: 999px; background: var(--border); overflow: hidden; }
+.conf-fill { height: 100%; border-radius: 999px; }
+.g-ancorado .conf-fill { background: var(--ok); }
+.g-apoiado .conf-fill { background: var(--info); }
+.g-sem-base .conf-fill { background: var(--warn); }
+
+.diag-block { margin-bottom: 14px; }
+.diag-block h4 {
+  margin: 0 0 5px; font-size: 12px; text-transform: uppercase;
+  letter-spacing: 0.6px; color: var(--text-faint);
+}
+.diag-block p { margin: 0; font-size: 13.5px; }
+/* Conteúdo curado vem com quebras (Sintoma/Causa/Passos) — preservar. */
+.diag-block p.pre { white-space: pre-line; }
+
+.clipper-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+.clipper-cta { padding: 6px 0 2px; }
+.clipper-error {
+  margin-top: 12px; padding: 12px 14px; border-radius: 8px;
+  background: var(--crit-soft); color: var(--crit); font-size: 13px;
 }
 
-.gate-source-link {
-  color: #f1b287;
+/* Nota explicando o gate — a legenda ensina o técnico a ler o selo. */
+.gate-note {
+  margin-top: 20px; padding: 13px 15px; border-radius: 8px;
+  border: 1px dashed var(--border-strong); background: var(--surface-2);
+  font-size: 12.5px; color: var(--text-muted);
+}
+.gate-note strong { color: var(--text); }
+.gate-legend { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+.gate-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend-ok { color: var(--ok); font-weight: 700; }
+.legend-info { color: var(--info); font-weight: 700; }
+.legend-warn { color: var(--warn); font-weight: 700; }
+
+button:focus-visible, a:focus-visible, .queue-row:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
 }
 
-/* O conteúdo curado chega com quebras de linha (Sintoma/Causa/Passos). */
-.diagnose-steps {
-  white-space: pre-line;
-}
-
-.diagnose-line {
-  margin: 0 0 10px;
-  line-height: 1.5;
-}
-
-.diagnose-line strong {
-  color: #f1b287;
-}
-
-.diagnose-meta {
-  margin: 4px 0 0;
-  font-size: 0.82rem;
-  color: rgba(244, 239, 228, 0.7);
-}
-
-@media (max-width: 640px) {
-  .dashboard {
-    padding: 24px 16px 48px;
-  }
-
-  .hero,
-  .widget {
-    padding: 24px;
-  }
-
-  .widget-header,
-  .ticket-list-header,
-  .ticket-card-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .widget-grid {
-    grid-template-columns: 1fr;
-  }
+/* Console é desktop-first (decisão de produto: o técnico trabalha em
+   tela grande). Abaixo de 980px só não é hostil: empilha e segue usável. */
+@media (max-width: 980px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { display: none; }
+  .panes { grid-template-columns: 1fr; }
+  .queue { max-height: 40vh; border-right: 0; border-bottom: 1px solid var(--border); }
 }
