@@ -53,6 +53,13 @@ class DiagnosticEngineTest {
         assertEquals(1.0, result.confidence());
         // O conteúdo curado chega inteiro pro técnico.
         assertEquals(artigo1443().getContent(), result.nextSteps());
+
+        // Grounding estruturado — o que o frontend consome pro selo (sem
+        // parsear string). Ancorado não tem modelo: IA não participou.
+        assertEquals(Grounding.State.ANCORADO, result.grounding().state());
+        assertEquals("Cupom fiscal não aparece na rotina 1443", result.grounding().articleTitle());
+        assertEquals("https://exemplo.com/artigo-1443", result.grounding().articleUrl());
+        assertNull(result.grounding().model());
     }
 
     @Test
@@ -99,8 +106,34 @@ class DiagnosticEngineTest {
         assertTrue(result.source().startsWith("apoiado: "));
         assertTrue(result.source().contains("Cupom fiscal não aparece na rotina 1443"));
         assertTrue(result.source().contains("via gpt-4o-mini"));
-        // Confiança aqui é a autoavaliação do LLM (temperar é o Degrau 3).
+        // 0.8 está abaixo do teto do estado apoiado (0.9) → passa intacto.
+        // O teto é teto, não piso — a autoavaliação baixa do LLM é respeitada.
         assertEquals(0.8, result.confidence());
+
+        // 4) Grounding estruturado: apoiado tem artigo E modelo (foi a IA que
+        //    costurou, com o artigo de lastro).
+        assertEquals(Grounding.State.APOIADO, result.grounding().state());
+        assertEquals(artigo.getTitle(), result.grounding().articleTitle());
+        assertEquals("gpt-4o-mini", result.grounding().model());
+    }
+
+    @Test
+    void tetoDeConfiancaCortaAutoavaliacaoInflada() {
+        // A "mentira viva" do Degrau 3: sem lastro pleno, o LLM ainda pode se
+        // dar 0.95. O gate corta no teto do estado — apoiado nunca passa de
+        // 0.9 (só curado verbatim vale 1.0). É o que impede um selo de
+        // confiança inflado de chegar na tela do técnico.
+        KnowledgeSearch knowledge = mock(KnowledgeSearch.class);
+        when(knowledge.search(anyString()))
+                .thenReturn(Optional.of(match(artigo1443(), KnowledgeMatch.Strength.WEAK)));
+
+        DiagnosticProvider provider = (request, material) -> new DiagnosticResult(
+                "causa", "passos", 0.95, "gpt-4o-mini");
+
+        DiagnosticEngine engine = new DiagnosticEngine(provider, new Anonymizer(), knowledge);
+        DiagnosticResult result = engine.run(new DiagnosticRequest("Cupom sumido", "detalhe"));
+
+        assertEquals(0.9, result.confidence());
     }
 
     @Test
@@ -143,6 +176,15 @@ class DiagnosticEngineTest {
         // 3) O gate marca a origem: sem lastro na base, e diz qual modelo foi.
         assertTrue(result.source().startsWith("sem-base: "));
         assertTrue(result.source().contains("gpt-4o-mini"));
+
+        // 4) Sem base, a confiança nunca passa de "talvez": o 0.7 que o LLM
+        //    se deu é cortado no teto do estado sem-base (0.5).
+        assertEquals(0.5, result.confidence());
+
+        // 5) Grounding estruturado: sem-base não tem artigo, só o modelo.
+        assertEquals(Grounding.State.SEM_BASE, result.grounding().state());
+        assertNull(result.grounding().articleTitle());
+        assertEquals("gpt-4o-mini", result.grounding().model());
     }
 
     // Artigo de exemplo compartilhado pelos cenários (recriado a cada uso pra

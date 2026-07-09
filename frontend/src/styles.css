@@ -243,6 +243,72 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* Selo do gate de grounding: linha com o selo à esquerda e o percentual de
+   confiança à direita — a origem da resposta é a primeira leitura do técnico. */
+.diagnose-gate {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.gate-badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Verde = ancorado (curado oficial, sem IA). */
+.gate-badge.is-anchored {
+  color: #0f3d26;
+  background: rgba(104, 211, 145, 0.85);
+}
+
+/* Laranja = apoiado (IA com lastro em artigo curado). */
+.gate-badge.is-supported {
+  color: #132238;
+  background: rgba(241, 178, 135, 0.85);
+}
+
+/* Neutro apagado = sem base (só IA, tratar com desconfiança). */
+.gate-badge.is-ungrounded {
+  color: rgba(244, 239, 228, 0.85);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.gate-confidence {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.confidence-bar {
+  height: 6px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.confidence-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #f1b287, #68d391);
+}
+
+.gate-source-link {
+  color: #f1b287;
+}
+
+/* O conteúdo curado chega com quebras de linha (Sintoma/Causa/Passos). */
+.diagnose-steps {
+  white-space: pre-line;
+}
+
 .diagnose-line {
   margin: 0 0 10px;
   line-height: 1.5;

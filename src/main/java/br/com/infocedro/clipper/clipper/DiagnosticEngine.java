@@ -23,6 +23,14 @@ import br.com.infocedro.clipper.knowledge.KnowledgeSearch;
 @Component
 public class DiagnosticEngine {
 
+    // Tetos de confiança por estado do gate (Degrau 3). A confiança da IA é
+    // autoavaliação — sem lastro, o modelo pode dizer 0.9 na maior cara de pau.
+    // O teto é a régua de honestidade do produto: apoiado fica logo abaixo do
+    // ancorado (1.0), e sem-base nunca passa de "talvez". É TETO, não piso:
+    // se o modelo disser 0.3, vale o 0.3 dele.
+    private static final double MAX_CONFIDENCE_APOIADO = 0.9;
+    private static final double MAX_CONFIDENCE_SEM_BASE = 0.5;
+
     private final DiagnosticProvider provider;
     private final Anonymizer anonymizer;
     private final KnowledgeSearch knowledge;
@@ -58,12 +66,15 @@ public class DiagnosticEngine {
             KnowledgeArticle article = match.get().article();
             DiagnosticResult result = provider.diagnose(masked, contextOf(article));
             return unmasked(result, mapping,
-                    "apoiado: " + titleWithUrl(article) + " · via " + result.source());
+                    "apoiado: " + titleWithUrl(article) + " · via " + result.source(),
+                    MAX_CONFIDENCE_APOIADO,
+                    Grounding.supported(article.getTitle(), article.getSourceUrl(), result.source()));
         }
 
         // 3) Sem pista na base → IA sozinha, marcada como sem lastro.
         DiagnosticResult result = provider.diagnose(masked);
-        return unmasked(result, mapping, "sem-base: " + result.source());
+        return unmasked(result, mapping, "sem-base: " + result.source(),
+                MAX_CONFIDENCE_SEM_BASE, Grounding.ungrounded(result.source()));
     }
 
     // Resposta ancorada num artigo curado: fonte oficial, confiança plena.
@@ -72,18 +83,21 @@ public class DiagnosticEngine {
                 article.getTitle(),   // problema (ver seam: content mistura causa+passos)
                 article.getContent(), // texto curado inteiro
                 1.0,                  // curado oficial → sem autoavaliação do LLM
-                "ancorado: " + titleWithUrl(article));
+                "ancorado: " + titleWithUrl(article),
+                Grounding.anchored(article.getTitle(), article.getSourceUrl()));
     }
 
-    // Des-anonimiza a resposta da IA (tokens voltam a ser o dado real) e
-    // carimba o source que o gate decidiu. A confiança segue a autoavaliação
-    // do LLM — temperá-la é o Degrau 3.
-    private DiagnosticResult unmasked(DiagnosticResult result, Map<String, String> mapping, String source) {
+    // Des-anonimiza a resposta da IA (tokens voltam a ser o dado real),
+    // carimba o gate (string legível + grounding estruturado) e aplica o teto
+    // de confiança do estado — a autoavaliação do LLM nunca supera o lastro.
+    private DiagnosticResult unmasked(DiagnosticResult result, Map<String, String> mapping,
+            String source, double confidenceCeiling, Grounding grounding) {
         return new DiagnosticResult(
                 anonymizer.unmask(result.probableCause(), mapping),
                 anonymizer.unmask(result.nextSteps(), mapping),
-                result.confidence(),
-                source);
+                Math.min(result.confidence(), confidenceCeiling),
+                source,
+                grounding);
     }
 
     // Tradução entidade → contrato: o provider não conhece o módulo knowledge.

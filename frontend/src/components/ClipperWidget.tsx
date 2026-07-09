@@ -12,11 +12,26 @@ type Ticket = {
   status: string;
 };
 
+// Os três estados do gate de grounding — espelham o enum Grounding.State do
+// backend. É contrato: se o backend ganhar um estado novo, o TypeScript
+// aponta os switches/mapas incompletos aqui.
+type GroundingState = "ANCORADO" | "APOIADO" | "SEM_BASE";
+
+type Grounding = {
+  state: GroundingState;
+  articleTitle: string | null;
+  articleUrl: string | null;
+  model: string | null;
+};
+
 type DiagnosticResult = {
   probableCause: string;
   nextSteps: string;
   confidence: number;
+  // String legível ("ancorado: ...") — humano/log. A UI decide pelo
+  // grounding estruturado, nunca parseando esta string.
   source: string;
+  grounding: Grounding;
 };
 
 type DiagnoseState = {
@@ -37,6 +52,14 @@ const statusLabel: Record<string, string> = {
   ABERTO: "Aberto",
   EM_ANALISE: "Em análise",
   RESOLVIDO: "Resolvido",
+};
+
+// O selo do gate: rótulo + tom visual por estado. Rótulos neutros de
+// propósito ("fonte oficial", nunca nome de marca de terceiros na UI).
+const gateBadge: Record<GroundingState, { label: string; className: string }> = {
+  ANCORADO: { label: "Ancorado · fonte oficial", className: "is-anchored" },
+  APOIADO: { label: "Apoiado · fonte oficial + IA", className: "is-supported" },
+  SEM_BASE: { label: "Sem base · somente IA", className: "is-ungrounded" },
 };
 
 export default function ClipperWidget({
@@ -139,15 +162,58 @@ export default function ClipperWidget({
 
                 {diag?.result ? (
                   <div className="diagnose-result">
+                    {/* Selo do gate + confiança: a primeira coisa que o técnico
+                        lê é DE ONDE veio a resposta e quanto ela vale. */}
+                    <div className="diagnose-gate">
+                      <span
+                        className={`gate-badge ${gateBadge[diag.result.grounding.state].className}`}
+                      >
+                        {gateBadge[diag.result.grounding.state].label}
+                      </span>
+                      <span className="gate-confidence">
+                        {Math.round(diag.result.confidence * 100)}%
+                      </span>
+                    </div>
+                    <div className="confidence-bar" aria-hidden="true">
+                      <div
+                        className="confidence-fill"
+                        style={{ width: `${Math.round(diag.result.confidence * 100)}%` }}
+                      />
+                    </div>
+
                     <p className="diagnose-line">
                       <strong>Causa provável:</strong> {diag.result.probableCause}
                     </p>
-                    <p className="diagnose-line">
+                    {/* pre-line: o conteúdo curado vem com quebras de linha
+                        (Sintoma / Causa / Passos) e elas devem aparecer. */}
+                    <p className="diagnose-line diagnose-steps">
                       <strong>Próximos passos:</strong> {diag.result.nextSteps}
                     </p>
+
                     <p className="diagnose-meta">
-                      Confiança: {Math.round(diag.result.confidence * 100)}% · Fonte:{" "}
-                      {diag.result.source}
+                      {diag.result.grounding.articleTitle ? (
+                        <>
+                          Base: {diag.result.grounding.articleTitle}
+                          {diag.result.grounding.articleUrl ? (
+                            <>
+                              {" · "}
+                              <a
+                                className="gate-source-link"
+                                href={diag.result.grounding.articleUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                ver fonte oficial
+                              </a>
+                            </>
+                          ) : null}
+                        </>
+                      ) : (
+                        "Sem artigo de base para este chamado"
+                      )}
+                      {diag.result.grounding.model
+                        ? ` · via ${diag.result.grounding.model}`
+                        : null}
                     </p>
                   </div>
                 ) : null}
