@@ -36,8 +36,15 @@ public class KnowledgeSearch {
         Map<Long, KnowledgeArticle> articlesById = new HashMap<>();
 
         for (String token : tokenize(query)) {
+            // O banco é só o filtro GROSSO (substring): "144" também traria o
+            // artigo de "1443". Quem decide se o ponto vale é a confirmação
+            // por palavra inteira logo abaixo — errar aqui entregaria ao
+            // técnico a solução do problema errado com selo de "ancorado".
             List<KnowledgeArticle> matches = repository.findByKeywordsContainingIgnoreCase(token);
             for (KnowledgeArticle article : matches) {
+                if (!tokenize(article.getKeywords()).contains(token)) {
+                    continue; // casou só por pedaço de keyword → não conta
+                }
                 hitsByArticle.merge(article.getId(), 1, Integer::sum);
                 articlesById.put(article.getId(), article);
             }

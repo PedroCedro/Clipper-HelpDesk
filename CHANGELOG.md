@@ -20,6 +20,7 @@ O formato segue o padrão Keep a Changelog.
 - documento de arquitetura (`ARQUITETURA.md`)
 - base de conhecimento curada (`KnowledgeArticle`, `KnowledgeRepository`) com seed em YAML de 3 artigos sobre NFC-e em contingência
 - busca por palavra-chave na base de conhecimento (`KnowledgeSearch`), com limiar mínimo de tokens para considerar um match forte
+- testes de unidade do retrieval (`KnowledgeSearchTest`, trava o limiar de match forte) e do contrato do gate de grounding no motor (`DiagnosticEngineTest`: ancorado não chama IA; sem base a IA só recebe texto mascarado)
 
 ### Changed
 - clipper desacoplado do módulo ticket via contrato `DiagnosticRequest`
@@ -31,3 +32,4 @@ O formato segue o padrão Keep a Changelog.
 ### Fixed
 - `moduleResolution` do tsconfig do frontend ajustado para `Bundler`
 - busca de ticket inexistente passa a responder `404` em vez de `500`
+- busca da base de conhecimento não casa mais por pedaço de keyword (token "144" não ancora mais no artigo da rotina 1443) — o ponto só vale se o token for palavra inteira das keywords
