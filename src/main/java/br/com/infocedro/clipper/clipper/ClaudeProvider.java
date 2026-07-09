@@ -44,7 +44,7 @@ public class ClaudeProvider implements DiagnosticProvider {
     }
 
     @Override
-    public DiagnosticResult diagnose(DiagnosticRequest request) {
+    public DiagnosticResult diagnose(DiagnosticRequest request, KnowledgeContext knowledge) {
         if (properties.apiKey() == null || properties.apiKey().isBlank()) {
             throw new DiagnosticProviderException(
                     "Chave de IA ausente. Defina a variável de ambiente com a chave da Anthropic.");
@@ -55,7 +55,7 @@ public class ClaudeProvider implements DiagnosticProvider {
                     .model(properties.model())
                     .maxTokens(1024L)
                     .system(SYSTEM_PROMPT)
-                    .addUserMessage(userContent(request))
+                    .addUserMessage(userContent(request, knowledge))
                     .build();
 
             Message message = client.messages().create(params);
@@ -74,9 +74,20 @@ public class ClaudeProvider implements DiagnosticProvider {
         }
     }
 
-    private String userContent(DiagnosticRequest request) {
-        return "Título do chamado: " + request.title() + "\n"
+    private String userContent(DiagnosticRequest request, KnowledgeContext knowledge) {
+        String content = "Título do chamado: " + request.title() + "\n"
                 + "Descrição: " + request.description();
+        if (knowledge == null) {
+            return content;
+        }
+        // Mesmo formato de material de apoio do provider OpenAI-compatível —
+        // se este bloco começar a divergir/duplicar, é sinal de extrair um
+        // montador de prompt comum (por ora, duplicação de 2 é barata).
+        return content + "\n\n"
+                + "Material de apoio (documentação oficial curada). Fundamente o diagnóstico\n"
+                + "neste material, adaptando-o ao chamado acima:\n"
+                + "Artigo: " + knowledge.title() + "\n"
+                + knowledge.content();
     }
 
     // Diferente do provider OpenAI-compatível, aqui o SDK já entrega o texto

@@ -43,7 +43,7 @@ public class OpenAiCompatibleProvider implements DiagnosticProvider {
     }
 
     @Override
-    public DiagnosticResult diagnose(DiagnosticRequest request) {
+    public DiagnosticResult diagnose(DiagnosticRequest request, KnowledgeContext knowledge) {
         if (properties.apiKey() == null || properties.apiKey().isBlank()) {
             throw new DiagnosticProviderException(
                     "Chave de IA ausente. Defina a variável de ambiente OPENAI_API_KEY.");
@@ -53,7 +53,7 @@ public class OpenAiCompatibleProvider implements DiagnosticProvider {
                 "model", properties.model(),
                 "messages", List.of(
                         Map.of("role", "system", "content", SYSTEM_PROMPT),
-                        Map.of("role", "user", "content", userContent(request))),
+                        Map.of("role", "user", "content", userContent(request, knowledge))),
                 "response_format", Map.of("type", "json_object"));
 
         String rawResponse;
@@ -73,9 +73,21 @@ public class OpenAiCompatibleProvider implements DiagnosticProvider {
         return parse(rawResponse);
     }
 
-    private String userContent(DiagnosticRequest request) {
-        return "Título do chamado: " + request.title() + "\n"
+    private String userContent(DiagnosticRequest request, KnowledgeContext knowledge) {
+        String content = "Título do chamado: " + request.title() + "\n"
                 + "Descrição: " + request.description();
+        if (knowledge == null) {
+            return content;
+        }
+        // RAG-lite: o artigo curado entra como material de apoio no MESMO turno
+        // do usuário (prompt simples primeiro; mensagem separada/caching depois,
+        // se o prompt crescer). A instrução pede pra fundamentar NELE — é o que
+        // diferencia "apoiado" de um chute do modelo.
+        return content + "\n\n"
+                + "Material de apoio (documentação oficial curada). Fundamente o diagnóstico\n"
+                + "neste material, adaptando-o ao chamado acima:\n"
+                + "Artigo: " + knowledge.title() + "\n"
+                + knowledge.content();
     }
 
     // A resposta traz choices[0].message.content, que por sua vez é uma STRING JSON

@@ -16,8 +16,10 @@ import org.springframework.stereotype.Service;
 public class KnowledgeSearch {
 
     // Quantos tokens distintos do ticket precisam casar com o MESMO artigo pra
-    // ele contar como "ancorado". É o botão que separa match forte de ruído:
-    // 1 token só (ex.: "nota") casaria com quase tudo e falsearia o grounding.
+    // o match contar como FORTE (lookup puro, artigo verbatim). Abaixo disso,
+    // 1 token vira match FRACO (artigo vai de apoio pro prompt da IA — RAG):
+    // sozinho ele não sustenta o selo "ancorado", mas jogar fora seria
+    // desperdiçar a pista. É o botão que separa lookup de RAG.
     private static final int MIN_TOKEN_HITS = 2;
 
     private final KnowledgeRepository repository;
@@ -26,7 +28,7 @@ public class KnowledgeSearch {
         this.repository = repository;
     }
 
-    public Optional<KnowledgeArticle> search(String query) {
+    public Optional<KnowledgeMatch> search(String query) {
         if (query == null || query.isBlank()) {
             return Optional.empty();
         }
@@ -50,11 +52,17 @@ public class KnowledgeSearch {
             }
         }
 
-        // Vence o artigo com mais tokens casados, desde que passe do limiar.
+        // Vence o artigo com mais tokens casados; o limiar não descarta mais,
+        // ele CLASSIFICA: no limiar ou acima → forte; abaixo (1 token) → fraco.
+        // Empate no placar é decidido arbitrariamente — ok pro MVP, e no fraco
+        // a IA ainda tempera o artigo escolhido com o contexto do ticket.
         return hitsByArticle.entrySet().stream()
-                .filter(entry -> entry.getValue() >= MIN_TOKEN_HITS)
                 .max(Map.Entry.comparingByValue())
-                .map(entry -> articlesById.get(entry.getKey()));
+                .map(entry -> new KnowledgeMatch(
+                        articlesById.get(entry.getKey()),
+                        entry.getValue() >= MIN_TOKEN_HITS
+                                ? KnowledgeMatch.Strength.STRONG
+                                : KnowledgeMatch.Strength.WEAK));
     }
 
     // "Feio primeiro": minúsculas, quebra em palavras, descarta tokens curtos.

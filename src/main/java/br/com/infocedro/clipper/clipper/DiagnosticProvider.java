@@ -5,5 +5,15 @@ package br.com.infocedro.clipper.clipper;
 // fallback, ou até IA local — sem tocar em quem orquestra (DiagnosticEngine).
 public interface DiagnosticProvider {
 
-    DiagnosticResult diagnose(DiagnosticRequest request);
+    // O método real: chamado + material curado de apoio (RAG-lite).
+    // knowledge == null significa "sem material" — o provider monta o prompt
+    // só com o chamado. Cada provider decide COMO o material entra no prompt
+    // (formatar prompt é responsabilidade de quem fala com o LLM, não do
+    // orquestrador).
+    DiagnosticResult diagnose(DiagnosticRequest request, KnowledgeContext knowledge);
+
+    // Atalho pro caminho sem base — evita espalhar null pelos chamadores.
+    default DiagnosticResult diagnose(DiagnosticRequest request) {
+        return diagnose(request, null);
+    }
 }

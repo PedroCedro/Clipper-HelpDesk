@@ -21,12 +21,15 @@ O formato segue o padrão Keep a Changelog.
 - base de conhecimento curada (`KnowledgeArticle`, `KnowledgeRepository`) com seed em YAML de 3 artigos sobre NFC-e em contingência
 - busca por palavra-chave na base de conhecimento (`KnowledgeSearch`), com limiar mínimo de tokens para considerar um match forte
 - testes de unidade do retrieval (`KnowledgeSearchTest`, trava o limiar de match forte) e do contrato do gate de grounding no motor (`DiagnosticEngineTest`: ancorado não chama IA; sem base a IA só recebe texto mascarado)
+- fluxo "apoiado" (RAG-lite): com match fraco na base, o artigo curado vai de material de apoio no prompt da IA via contrato `KnowledgeContext`, e o `source` marca `apoiado: <artigo> · via <modelo>`
 
 ### Changed
 - clipper desacoplado do módulo ticket via contrato `DiagnosticRequest`
 - motor de diagnóstico passa a retornar `DiagnosticResult` em vez de `String`
 - `DiagnosticEngine` passa a orquestrar delegando ao `DiagnosticProvider` (antes devolvia um diagnóstico fixo)
 - `DiagnosticEngine` aplica fluxo híbrido: consulta a base de conhecimento antes da IA; com match forte devolve o artigo curado (`source` = `ancorado: ...`, sem chamada de IA); sem match cai na IA e marca `source` = `sem-base: ...`
+- `KnowledgeSearch` passa a classificar a força do match (`KnowledgeMatch`): 2+ tokens = forte (lookup puro), 1 token = fraco (apoio pra IA) — antes o match de 1 token era descartado
+- `DiagnosticProvider.diagnose` passa a aceitar material de apoio opcional; os dois providers (OpenAI-compatível e Claude) incluem o artigo no prompt quando presente
 - textos pt-br (README, CHANGELOG, UI do frontend e comentários) passam a usar acentuação completa
 
 ### Fixed
