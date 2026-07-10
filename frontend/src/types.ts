@@ -11,6 +11,23 @@ export type Ticket = {
   title: string;
   description: string;
   status: string | null;
+  // Contexto do chamado: tudo pode vir nulo (ticket antigo no banco,
+  // intake mínimo via API). A UI omite o que não existe — nunca quebra.
+  priority: string | null;
+  requester: string | null;
+  routine: string | null;
+  createdAt: string | null;
+  // Resumo do último diagnóstico, composto na borda pelo backend
+  // (GET /tickets). Nulo = nunca diagnosticado, e a fila mostra a
+  // linha sem tag de IA — que é a verdade.
+  diagnosis: DiagnosisSummary | null;
+};
+
+// Só o que a tag de IA da fila precisa (estado do gate + confiança);
+// o diagnóstico completo é buscado por ticket, sob demanda.
+export type DiagnosisSummary = {
+  state: GroundingState;
+  confidence: number;
 };
 
 // Os três estados do gate — espelham o enum Grounding.State do backend.

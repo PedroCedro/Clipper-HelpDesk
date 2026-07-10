@@ -221,8 +221,7 @@ body { margin: 0; }
 
 .queue-row {
   display: grid;
-  /* 1ª coluna reservada pra barra de prioridade (entra na F2, quando o
-     Ticket tiver priority) — o grid já nasce com o lugar dela. */
+  /* 1ª coluna: a barra de prioridade (4px). */
   grid-template-columns: 4px 58px 1fr auto;
   gap: 12px; align-items: center;
   width: 100%;
@@ -249,6 +248,14 @@ body { margin: 0; }
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .q-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.q-time { font-size: 11px; color: var(--text-faint); }
+
+/* Barra de prioridade: cor por urgência nos mesmos pares semânticos do
+   resto do console. Sem prioridade = sem classe = invisível. */
+.prio { width: 4px; height: 34px; border-radius: 2px; align-self: center; }
+.p-alta { background: var(--crit); }
+.p-media { background: var(--warn); }
+.p-baixa { background: var(--ok); }
 
 .queue-empty { padding: 24px 20px; color: var(--text-muted); font-size: 13px; }
 .queue-error {
@@ -266,6 +273,12 @@ body { margin: 0; }
 .b-novo { background: var(--info-soft); color: var(--info); }
 .b-resolvido { background: var(--ok-soft); color: var(--ok); }
 .b-neutro { background: var(--surface-2); color: var(--text-muted); }
+
+/* Tag de IA da fila: mesmos pares do selo do gate no painel do Clipper
+   (ok=ancorado, info=apoiado, warn=sem-base) — uma cor, um significado. */
+.b-ancorado { background: var(--ok-soft); color: var(--ok); }
+.b-apoiado { background: var(--info-soft); color: var(--info); }
+.b-sem-base { background: var(--warn-soft); color: var(--warn); }
 
 /* ---------- Formulário de novo ticket ---------- */
 /* Mínimo de propósito: existe pra alimentar a demo sem curl. O intake
@@ -297,6 +310,29 @@ body { margin: 0; }
 }
 .d-title { font-size: 20px; font-weight: 660; margin: 6px 0 12px; text-wrap: balance; }
 .d-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+
+/* Meta-grid do detalhe: rótulo miúdo em cima, valor embaixo. auto-fit
+   porque a quantidade de pares varia por ticket (só renderiza o que
+   existe) — o grid se acomoda sem célula fantasma. */
+.meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px 20px;
+  margin-bottom: 18px;
+  padding: 12px 16px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.meta-item { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.meta-label {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--text-faint);
+}
+.meta-value {
+  font-size: 13px; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 
 .section-label {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;

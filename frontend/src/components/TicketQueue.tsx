@@ -1,4 +1,4 @@
-import type { Ticket } from "../types";
+import type { GroundingState, Ticket } from "../types";
 
 type TicketQueueProps = {
   tickets: Ticket[];
@@ -17,9 +17,36 @@ const statusBadge: Record<string, { label: string; className: string }> = {
   RESOLVIDO: { label: "Resolvido", className: "b-resolvido" },
 };
 
+// Tag de IA da fila: versão curta do selo do gate (o rótulo completo
+// vive no painel do Clipper). Mesmo contrato de lá: estado novo no
+// backend obriga o TypeScript a apontar este mapa incompleto.
+const aiTag: Record<GroundingState, { label: string; className: string }> = {
+  ANCORADO: { label: "Ancorado", className: "b-ancorado" },
+  APOIADO: { label: "Apoiado", className: "b-apoiado" },
+  SEM_BASE: { label: "Sem base", className: "b-sem-base" },
+};
+
+// Barra de prioridade (a coluna de 4px): cor por urgência. Prioridade
+// nula ou desconhecida fica invisível — ausência não é alarme.
+const prioBar: Record<string, string> = {
+  ALTA: "p-alta",
+  MEDIA: "p-media",
+  BAIXA: "p-baixa",
+};
+
+// "aberto há X": tempo relativo curto pra triagem visual. Calculado no
+// render — precisão de minuto basta numa fila que recarrega ao navegar.
+function openSince(createdAt: string): string {
+  const mins = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60_000);
+  if (mins < 1) return "agora";
+  if (mins < 60) return `há ${mins} min`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `há ${hours} h`;
+  return `há ${Math.floor(hours / 24)} d`;
+}
+
 // Fila master-detail: cada linha é um <button> (semântica de clique e
-// foco por teclado de graça). A coluna vazia de 4px é a vaga da barra
-// de prioridade — entra na F2, quando o Ticket tiver priority.
+// foco por teclado de graça).
 export default function TicketQueue({
   tickets,
   selectedId,
@@ -49,13 +76,16 @@ export default function TicketQueue({
             label: ticket.status ?? "—",
             className: "b-neutro",
           };
+          const tag = ticket.diagnosis ? aiTag[ticket.diagnosis.state] : null;
           return (
             <button
               key={ticket.id}
               className={`queue-row${ticket.id === selectedId ? " sel" : ""}`}
               onClick={() => onSelect(ticket.id)}
             >
-              <span />
+              <span
+                className={`prio ${(ticket.priority && prioBar[ticket.priority]) || ""}`}
+              />
               <span className="tid">#{ticket.id}</span>
               <span className="q-main">
                 <span className="q-title">{ticket.title}</span>
@@ -65,6 +95,19 @@ export default function TicketQueue({
                 <span className={`badge ${badge.className}`}>
                   <span className="dot" /> {badge.label}
                 </span>
+                {tag && ticket.diagnosis ? (
+                  // A confiança fica no title (hover): na fila o que
+                  // decide a triagem é o ESTADO; o número vive no painel.
+                  <span
+                    className={`badge ${tag.className}`}
+                    title={`Confiança ${Math.round(ticket.diagnosis.confidence * 100)}%`}
+                  >
+                    <span className="dot" /> {tag.label}
+                  </span>
+                ) : null}
+                {ticket.createdAt ? (
+                  <span className="q-time">{openSince(ticket.createdAt)}</span>
+                ) : null}
               </span>
             </button>
           );

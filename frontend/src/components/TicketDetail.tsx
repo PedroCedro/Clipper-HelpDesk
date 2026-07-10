@@ -14,9 +14,17 @@ const statusChip: Record<string, { label: string; className: string }> = {
   RESOLVIDO: { label: "Resolvido", className: "b-resolvido" },
 };
 
-// Painel de detalhe do ticket selecionado. O meta-grid do mockup
-// (solicitante/filial/rotina/responsável) entra na F2, quando o Ticket
-// tiver esses campos — placeholder vazio aqui seria só ruído.
+// Prioridade legível no meta-grid; valor desconhecido passa cru — dado
+// novo do backend aparece, mesmo sem tradução bonita.
+const prioLabel: Record<string, string> = {
+  ALTA: "Alta",
+  MEDIA: "Média",
+  BAIXA: "Baixa",
+};
+
+// Painel de detalhe do ticket selecionado. O meta-grid mostra SÓ os
+// campos que existem — célula vazia ou "null" na tela seria só ruído
+// (tickets antigos no banco não têm esses campos).
 export default function TicketDetail({ ticket, diag, onDiagnose }: TicketDetailProps) {
   if (!ticket) {
     return (
@@ -31,6 +39,28 @@ export default function TicketDetail({ ticket, diag, onDiagnose }: TicketDetailP
     className: "b-neutro",
   };
 
+  // Monta só os pares presentes; routine chega como "" no intake mínimo
+  // e o filtro de falsy já descarta junto com os nulos.
+  const meta = [
+    ticket.requester ? { label: "Solicitante", value: ticket.requester } : null,
+    ticket.routine ? { label: "Rotina", value: ticket.routine } : null,
+    ticket.priority
+      ? { label: "Prioridade", value: prioLabel[ticket.priority] ?? ticket.priority }
+      : null,
+    ticket.createdAt
+      ? {
+          label: "Aberto em",
+          value: new Date(ticket.createdAt).toLocaleString("pt-BR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        }
+      : null,
+  ].filter((item): item is { label: string; value: string } => item !== null);
+
   return (
     <section className="detail" aria-label="Detalhe do ticket">
       <div className="d-eyebrow">Ticket #{ticket.id}</div>
@@ -40,6 +70,17 @@ export default function TicketDetail({ ticket, diag, onDiagnose }: TicketDetailP
           <span className="dot" /> {chip.label}
         </span>
       </div>
+
+      {meta.length > 0 ? (
+        <div className="meta-grid">
+          {meta.map((item) => (
+            <div className="meta-item" key={item.label}>
+              <span className="meta-label">{item.label}</span>
+              <span className="meta-value">{item.value}</span>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       <p className="section-label">Descrição do solicitante</p>
       <div className="desc">{ticket.description}</div>

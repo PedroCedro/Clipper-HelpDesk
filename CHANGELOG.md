@@ -23,6 +23,7 @@ O formato segue o padrão Keep a Changelog.
 - testes de unidade do retrieval (`KnowledgeSearchTest`, trava o limiar de match forte) e do contrato do gate de grounding no motor (`DiagnosticEngineTest`: ancorado não chama IA; sem base a IA só recebe texto mascarado)
 - fluxo "apoiado" (RAG-lite): com match fraco na base, o artigo curado vai de material de apoio no prompt da IA via contrato `KnowledgeContext`, e o `source` marca `apoiado: <artigo> · via <modelo>`
 - tickets novos recebem status `NOVO` automaticamente na persistência
+- fila viva com tag do gate de IA, barra de prioridade, tempo de abertura e meta-grid do ticket; ao selecionar uma linha, o diagnóstico persistido é carregado sem nova chamada à IA
 
 ### Changed
 - clipper desacoplado do módulo ticket via contrato `DiagnosticRequest`
