@@ -20,6 +20,7 @@ public record TicketResponse(
         String requester,
         String routine,
         Instant createdAt,
+        String response,
         ClipperAgent.DiagnosisSummary diagnosis) {
 
     // diagnosis nulo = ticket nunca diagnosticado — o front mostra a linha
@@ -34,6 +35,7 @@ public record TicketResponse(
                 ticket.getRequester(),
                 ticket.getRoutine(),
                 ticket.getCreatedAt(),
+                ticket.getResponse(),
                 diagnosis);
     }
 }

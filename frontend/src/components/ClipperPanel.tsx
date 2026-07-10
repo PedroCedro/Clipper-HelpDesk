@@ -1,9 +1,11 @@
-import type { DiagnoseState, GroundingState, Ticket } from "../types";
+import { useEffect, useState } from "react";
+import type { DiagnoseState, DiagnosticResult, GroundingState, Ticket, TicketActions } from "../types";
 
 type ClipperPanelProps = {
   ticket: Ticket;
   diag: DiagnoseState | undefined;
   onDiagnose: (id: number) => void;
+  actions: TicketActions;
 };
 
 // O selo do gate: rótulo + classe visual por estado. Rótulos neutros de
@@ -16,16 +18,89 @@ const gateChip: Record<GroundingState, { label: string; className: string }> = {
   SEM_BASE: { label: "Sem base · somente IA", className: "g-sem-base" },
 };
 
+// O texto que "aplicar como resposta" manda pro solicitante: o diagnóstico
+// como o técnico viu, com os mesmos títulos do painel.
+function composeReply(result: DiagnosticResult): string {
+  return `Causa provável:\n${result.probableCause}\n\nPróximos passos:\n${result.nextSteps}`;
+}
+
+type ActionKind = "apply" | "escalate" | "feedback";
+
 // Painel "Diagnóstico do Clipper": o coração do console. Renderiza o
 // resultado pelo grounding ESTRUTURADO (nunca parseando a string source).
-export default function ClipperPanel({ ticket, diag, onDiagnose }: ClipperPanelProps) {
+//
+// O estado aqui é só o EFÊMERO de UI (qual ação está em voo, form de
+// feedback aberto) — o dado que importa (status, response, diagnóstico)
+// mora no Console. O TicketDetail remonta o painel por ticket
+// (key={ticket.id}), então nada disso vaza de um chamado pro outro.
+export default function ClipperPanel({ ticket, diag, onDiagnose, actions }: ClipperPanelProps) {
   const result = diag?.result;
+
+  const [acting, setActing] = useState<ActionKind | null>(null);
+  const [note, setNote] = useState<{ kind: "ok" | "erro"; text: string } | null>(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [feedbackSent, setFeedbackSent] = useState(false);
+
+  // O feedback pertence à RODADA de diagnóstico, não ao ticket (a B3
+  // aceita um feedback por rodada). O key do TicketDetail zera o painel
+  // ao trocar de chamado, mas rediagnosticar mantém o ticket — quem
+  // sinaliza "rodada nova" é o `result` trocando de referência. Aí o
+  // painel volta a aceitar feedback e limpa as notas da rodada anterior.
+  useEffect(() => {
+    setFeedbackSent(false);
+    setFeedbackOpen(false);
+    setReason("");
+    setNote(null);
+  }, [result]);
+
+  const busy = acting !== null || diag?.loading === true;
+
+  // Executor comum das três ações: trava os botões, traduz sucesso/erro
+  // em nota visível e destrava — o padrão é um só pra não divergir.
+  async function run(kind: ActionKind, action: () => Promise<void>, okText: string): Promise<boolean> {
+    setActing(kind);
+    setNote(null);
+    try {
+      await action();
+      setNote({ kind: "ok", text: okText });
+      return true;
+    } catch (err) {
+      setNote({ kind: "erro", text: err instanceof Error ? err.message : "Falha inesperada na ação." });
+      return false;
+    } finally {
+      setActing(null);
+    }
+  }
+
+  async function handleFeedback() {
+    // reason vazio vira null: o backend trata a ausência como legítima —
+    // feedback sem justificativa ainda alimenta a curadoria.
+    const sent = await run(
+      "feedback",
+      () => actions.onFlagIncorrect(ticket.id, reason.trim() || null),
+      "Feedback registrado — obrigado, isso alimenta a curadoria.",
+    );
+    if (sent) {
+      setFeedbackSent(true);
+      setFeedbackOpen(false);
+    }
+  }
 
   return (
     <div className="clipper">
       <div className="clipper-head">
         <span className="clipper-mark">C</span>
         <h3>Diagnóstico do Clipper</h3>
+        {result ? (
+          <button
+            className="btn-ghost btn-small"
+            onClick={() => onDiagnose(ticket.id)}
+            disabled={busy}
+          >
+            {diag?.loading ? "Rediagnosticando…" : "Rediagnosticar"}
+          </button>
+        ) : null}
       </div>
 
       <div className="clipper-body">
@@ -85,20 +160,68 @@ export default function ClipperPanel({ ticket, diag, onDiagnose }: ClipperPanelP
               <p className="pre">{result.nextSteps}</p>
             </div>
 
-            {/* Ações desabilitadas de propósito: os endpoints não existem
-                ainda (rodada B3). Botão que não faz nada seria mentira de
-                UI — desabilitado diz "existe, mas ainda não". */}
             <div className="clipper-actions">
-              <button className="btn-primary" disabled title="Em breve">
-                Aplicar como resposta
+              <button
+                className="btn-primary"
+                disabled={busy}
+                onClick={() =>
+                  run(
+                    "apply",
+                    () => actions.onApplyResponse(ticket.id, composeReply(result)),
+                    "Resposta aplicada — chamado resolvido.",
+                  )
+                }
+              >
+                {acting === "apply" ? "Aplicando…" : "Aplicar como resposta"}
               </button>
-              <button className="btn-ghost" disabled title="Em breve">
-                Escalar para humano
+              <button
+                className="btn-ghost"
+                disabled={busy}
+                onClick={() =>
+                  run(
+                    "escalate",
+                    () => actions.onEscalate(ticket.id),
+                    "Chamado escalado para atendimento humano.",
+                  )
+                }
+              >
+                {acting === "escalate" ? "Escalando…" : "Escalar para humano"}
               </button>
-              <button className="btn-ghost" disabled title="Em breve">
-                Marcar diagnóstico incorreto
-              </button>
+              {feedbackSent ? (
+                // Vira texto, não botão desabilitado: a ação já aconteceu,
+                // não está indisponível.
+                <span className="feedback-done">✓ Feedback registrado</span>
+              ) : (
+                <button
+                  className="btn-ghost"
+                  disabled={busy}
+                  onClick={() => setFeedbackOpen((v) => !v)}
+                >
+                  Marcar diagnóstico incorreto
+                </button>
+              )}
             </div>
+
+            {feedbackOpen && !feedbackSent ? (
+              <div className="feedback-form">
+                <textarea
+                  rows={2}
+                  placeholder="Por que está errado? (opcional — é o dado mais valioso pra curadoria)"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                />
+                <div className="feedback-form-actions">
+                  <button className="btn-primary" disabled={busy} onClick={handleFeedback}>
+                    {acting === "feedback" ? "Enviando…" : "Enviar feedback"}
+                  </button>
+                  <button className="btn-ghost" disabled={busy} onClick={() => setFeedbackOpen(false)}>
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
+            {note ? <p className={`action-note ${note.kind}`}>{note.text}</p> : null}
 
             <div className="gate-note">
               <strong>Como o Clipper decide a fonte.</strong> Com artigo oficial que

@@ -1,3 +1,4 @@
+import { statusBadge } from "../statusBadge";
 import type { GroundingState, Ticket } from "../types";
 
 type TicketQueueProps = {
@@ -6,15 +7,6 @@ type TicketQueueProps = {
   onSelect: (id: number) => void;
   isLoading: boolean;
   error: string | null;
-};
-
-// Mapa status → rótulo + tom. Status desconhecido cai no neutro em vez
-// de quebrar — o backend pode ganhar status novos antes do front.
-const statusBadge: Record<string, { label: string; className: string }> = {
-  NOVO: { label: "Novo", className: "b-novo" },
-  ABERTO: { label: "Aberto", className: "b-novo" },
-  EM_ANALISE: { label: "Em análise", className: "b-analise" },
-  RESOLVIDO: { label: "Resolvido", className: "b-resolvido" },
 };
 
 // Tag de IA da fila: versão curta do selo do gate (o rótulo completo
@@ -72,10 +64,7 @@ export default function TicketQueue({
         </p>
       ) : (
         tickets.map((ticket) => {
-          const badge = (ticket.status ? statusBadge[ticket.status] : undefined) ?? {
-            label: ticket.status ?? "—",
-            className: "b-neutro",
-          };
+          const badge = statusBadge(ticket.status);
           const tag = ticket.diagnosis ? aiTag[ticket.diagnosis.state] : null;
           return (
             <button

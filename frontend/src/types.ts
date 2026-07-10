@@ -17,6 +17,9 @@ export type Ticket = {
   requester: string | null;
   routine: string | null;
   createdAt: string | null;
+  // A resposta aplicada ao solicitante — nula até a ação "aplicar como
+  // resposta" acontecer.
+  response: string | null;
   // Resumo do último diagnóstico, composto na borda pelo backend
   // (GET /tickets). Nulo = nunca diagnosticado, e a fila mostra a
   // linha sem tag de IA — que é a verdade.
@@ -57,4 +60,13 @@ export type DiagnoseState = {
   loading: boolean;
   result?: DiagnosticResult;
   error?: string;
+};
+
+// As ações do painel (rodada B3 do backend). O Console é o dono das
+// chamadas e do estado dos tickets; o painel só dispara e espera — as
+// Promises rejeitam com Error legível pra UI exibir.
+export type TicketActions = {
+  onApplyResponse: (id: number, text: string) => Promise<void>;
+  onEscalate: (id: number) => Promise<void>;
+  onFlagIncorrect: (id: number, reason: string | null) => Promise<void>;
 };

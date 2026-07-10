@@ -5,7 +5,7 @@ import TicketQueue from "../components/TicketQueue";
 import TicketDetail from "../components/TicketDetail";
 import NewTicketForm from "../components/NewTicketForm";
 import { useTheme } from "../hooks/useTheme";
-import type { DiagnoseState, DiagnosticResult, Ticket } from "../types";
+import type { DiagnoseState, DiagnosticResult, Ticket, TicketActions } from "../types";
 
 // Página do console: DONA de todo o estado (tickets, seleção, busca,
 // diagnósticos). Os componentes abaixo dela são apresentação — mesma
@@ -160,6 +160,53 @@ export default function Console() {
     }
   }
 
+  // Aplica no estado o ticket que voltou de uma ação (reply/escalate).
+  // O POST devolve a ENTIDADE (sem o campo diagnosis da listagem), então
+  // mescla por campo em vez de substituir — a tag de IA da linha fica.
+  function mergeTicket(updated: Ticket) {
+    setTickets((prev) =>
+      prev.map((t) =>
+        t.id === updated.id
+          ? { ...t, status: updated.status, response: updated.response }
+          : t,
+      ),
+    );
+  }
+
+  const actions: TicketActions = {
+    async onApplyResponse(id, text) {
+      const response = await fetch(`/api/tickets/${id}/reply`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ response: text }),
+      });
+      if (!response.ok) {
+        throw new Error(`Não foi possível aplicar a resposta (HTTP ${response.status}).`);
+      }
+      mergeTicket((await response.json()) as Ticket);
+    },
+
+    async onEscalate(id) {
+      const response = await fetch(`/api/tickets/${id}/escalate`, { method: "POST" });
+      if (!response.ok) {
+        throw new Error(`Não foi possível escalar o ticket (HTTP ${response.status}).`);
+      }
+      mergeTicket((await response.json()) as Ticket);
+    },
+
+    async onFlagIncorrect(id, reason) {
+      const response = await fetch(`/api/tickets/${id}/diagnosis/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason }),
+      });
+      if (!response.ok) {
+        throw new Error(`Não foi possível registrar o feedback (HTTP ${response.status}).`);
+      }
+      // Nada muda no ticket: feedback alimenta a curadoria, não o chamado.
+    },
+  };
+
   return (
     <div className="app">
       <Sidebar ticketCount={tickets.length} />
@@ -190,6 +237,7 @@ export default function Console() {
             ticket={selectedTicket}
             diag={selectedTicket ? diagnoses[selectedTicket.id] : undefined}
             onDiagnose={handleDiagnose}
+            actions={actions}
           />
         </div>
       </div>

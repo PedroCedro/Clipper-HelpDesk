@@ -1,17 +1,12 @@
-import type { DiagnoseState, Ticket } from "../types";
+import { statusBadge } from "../statusBadge";
+import type { DiagnoseState, Ticket, TicketActions } from "../types";
 import ClipperPanel from "./ClipperPanel";
 
 type TicketDetailProps = {
   ticket: Ticket | null;
   diag: DiagnoseState | undefined;
   onDiagnose: (id: number) => void;
-};
-
-const statusChip: Record<string, { label: string; className: string }> = {
-  NOVO: { label: "Novo", className: "b-novo" },
-  ABERTO: { label: "Aberto", className: "b-novo" },
-  EM_ANALISE: { label: "Em análise", className: "b-analise" },
-  RESOLVIDO: { label: "Resolvido", className: "b-resolvido" },
+  actions: TicketActions;
 };
 
 // Prioridade legível no meta-grid; valor desconhecido passa cru — dado
@@ -25,7 +20,7 @@ const prioLabel: Record<string, string> = {
 // Painel de detalhe do ticket selecionado. O meta-grid mostra SÓ os
 // campos que existem — célula vazia ou "null" na tela seria só ruído
 // (tickets antigos no banco não têm esses campos).
-export default function TicketDetail({ ticket, diag, onDiagnose }: TicketDetailProps) {
+export default function TicketDetail({ ticket, diag, onDiagnose, actions }: TicketDetailProps) {
   if (!ticket) {
     return (
       <section className="detail" aria-label="Detalhe do ticket">
@@ -34,10 +29,7 @@ export default function TicketDetail({ ticket, diag, onDiagnose }: TicketDetailP
     );
   }
 
-  const chip = (ticket.status ? statusChip[ticket.status] : undefined) ?? {
-    label: ticket.status ?? "—",
-    className: "b-neutro",
-  };
+  const chip = statusBadge(ticket.status);
 
   // Monta só os pares presentes; routine chega como "" no intake mínimo
   // e o filtro de falsy já descarta junto com os nulos.
@@ -85,7 +77,18 @@ export default function TicketDetail({ ticket, diag, onDiagnose }: TicketDetailP
       <p className="section-label">Descrição do solicitante</p>
       <div className="desc">{ticket.description}</div>
 
-      <ClipperPanel ticket={ticket} diag={diag} onDiagnose={onDiagnose} />
+      {/* A resposta que foi aplicada ao solicitante — só existe depois da
+          ação "aplicar como resposta", e sobrevive a reload (vem do banco). */}
+      {ticket.response ? (
+        <>
+          <p className="section-label">Resposta ao solicitante</p>
+          <div className="desc pre">{ticket.response}</div>
+        </>
+      ) : null}
+
+      {/* key por ticket: remonta o painel ao trocar de chamado, zerando o
+          estado efêmero de UI (form de feedback, notas de ação). */}
+      <ClipperPanel key={ticket.id} ticket={ticket} diag={diag} onDiagnose={onDiagnose} actions={actions} />
     </section>
   );
 }

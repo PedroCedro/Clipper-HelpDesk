@@ -280,6 +280,9 @@ body { margin: 0; }
 .b-apoiado { background: var(--info-soft); color: var(--info); }
 .b-sem-base { background: var(--warn-soft); color: var(--warn); }
 
+/* Escalado pede atenção de gente — único status com o par crítico. */
+.b-escalado { background: var(--crit-soft); color: var(--crit); }
+
 /* ---------- Formulário de novo ticket ---------- */
 /* Mínimo de propósito: existe pra alimentar a demo sem curl. O intake
    de verdade (portal/zap) é outra superfície, outra fase. */
@@ -367,6 +370,33 @@ body { margin: 0; }
 }
 .clipper-head h3 { margin: 0; font-size: 14px; font-weight: 650; }
 .clipper-body { padding: 16px; }
+
+/* Rediagnosticar mora no cabeçalho do painel, discreto: é ação de
+   exceção (regastar IA), não o fluxo principal. */
+.clipper-head .btn-small {
+  margin-left: auto; font-size: 12px; padding: 4px 10px;
+}
+
+/* ---------- Ações do painel ---------- */
+.feedback-form { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.feedback-form textarea {
+  border: 1px solid var(--border-strong); border-radius: 8px;
+  background: var(--surface); color: var(--text);
+  font: inherit; font-size: 13px; padding: 8px 11px; outline: none;
+  resize: vertical;
+}
+.feedback-form textarea:focus { border-color: var(--accent); }
+.feedback-form-actions { display: flex; gap: 8px; }
+
+.feedback-done {
+  font-size: 12.5px; font-weight: 600; color: var(--ok);
+  display: inline-flex; align-items: center; padding: 8px 4px;
+}
+
+/* Resultado da ação: verde quando deu, vermelho quando não. */
+.action-note { margin: 12px 0 0; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; }
+.action-note.ok { background: var(--ok-soft); color: var(--ok); }
+.action-note.erro { background: var(--crit-soft); color: var(--crit); }
 
 /* Faixa do gate: fundo acompanha o estado — verde ancorado, azul
    apoiado, âmbar sem-base. O estado APOIADO não existia no mockup
