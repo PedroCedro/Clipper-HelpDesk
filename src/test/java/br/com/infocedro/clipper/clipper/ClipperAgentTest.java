@@ -2,10 +2,12 @@ package br.com.infocedro.clipper.clipper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -22,6 +24,7 @@ class ClipperAgentTest {
 
     private DiagnosticEngine engine;
     private DiagnosisRepository repository;
+    private DiagnosisFeedbackRepository feedbackRepository;
     private ClipperAgent agent;
 
     private final DiagnosticRequest request = new DiagnosticRequest("Cupom sumiu", "não sobe na 1443");
@@ -30,7 +33,8 @@ class ClipperAgentTest {
     void setUp() {
         engine = mock(DiagnosticEngine.class);
         repository = mock(DiagnosisRepository.class);
-        agent = new ClipperAgent(engine, repository);
+        feedbackRepository = mock(DiagnosisFeedbackRepository.class);
+        agent = new ClipperAgent(engine, repository, feedbackRepository);
     }
 
     @Test
@@ -96,6 +100,34 @@ class ClipperAgentTest {
         assertTrue(summary.isPresent());
         assertEquals(Grounding.State.ANCORADO, summary.get().state());
         assertEquals(1.0, summary.get().confidence());
+    }
+
+    @Test
+    void marcarIncorretoGravaSnapshotDoDiagnostico() {
+        when(repository.findByTicketId(7L)).thenReturn(Optional.of(Diagnosis.of(7L, resultadoAncorado())));
+        when(feedbackRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        agent.flagIncorrect(7L, "o artigo não fala desse cenário");
+
+        // O feedback congela o que o técnico estava vendo: mesmo que um
+        // rediagnóstico substitua a linha de Diagnosis depois, a curadoria
+        // ainda enxerga o diagnóstico que foi marcado como errado.
+        ArgumentCaptor<DiagnosisFeedback> saved = ArgumentCaptor.forClass(DiagnosisFeedback.class);
+        verify(feedbackRepository).save(saved.capture());
+        assertEquals(7L, saved.getValue().getTicketId());
+        assertEquals(Grounding.State.ANCORADO, saved.getValue().getGroundingState());
+        assertEquals("Cupom fiscal não aparece na rotina 1443", saved.getValue().getProbableCause());
+        assertEquals("https://exemplo.com/1443", saved.getValue().getArticleUrl());
+        assertEquals("o artigo não fala desse cenário", saved.getValue().getReason());
+    }
+
+    @Test
+    void marcarIncorretoSemDiagnosticoEhConflito() {
+        when(repository.findByTicketId(7L)).thenReturn(Optional.empty());
+
+        // Sem diagnóstico não há o que marcar — e nada pode ser gravado.
+        assertThrows(DiagnosisNotFoundException.class, () -> agent.flagIncorrect(7L, null));
+        verifyNoInteractions(feedbackRepository);
     }
 
     private DiagnosticResult resultadoAncorado() {

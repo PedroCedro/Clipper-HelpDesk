@@ -14,10 +14,13 @@ public class ClipperAgent {
 
     private final DiagnosticEngine diagnosticEngine;
     private final DiagnosisRepository diagnosisRepository;
+    private final DiagnosisFeedbackRepository feedbackRepository;
 
-    public ClipperAgent(DiagnosticEngine diagnosticEngine, DiagnosisRepository diagnosisRepository) {
+    public ClipperAgent(DiagnosticEngine diagnosticEngine, DiagnosisRepository diagnosisRepository,
+            DiagnosisFeedbackRepository feedbackRepository) {
         this.diagnosticEngine = diagnosticEngine;
         this.diagnosisRepository = diagnosisRepository;
+        this.feedbackRepository = feedbackRepository;
     }
 
     // Diagnostica E grava. Upsert de propósito: rediagnosticar substitui o
@@ -48,6 +51,16 @@ public class ClipperAgent {
     public Optional<DiagnosisSummary> summaryFor(Long ticketId) {
         return diagnosisRepository.findByTicketId(ticketId)
                 .map(d -> new DiagnosisSummary(d.getGroundingState(), d.getConfidence()));
+    }
+
+    // "Marcar diagnóstico incorreto": grava o feedback com o SNAPSHOT do
+    // diagnóstico atual (o que o técnico estava vendo). Sem diagnóstico não
+    // há o que marcar — 409 na borda. É o começo do flywheel: a curadoria
+    // lê os feedbacks pra decidir qual artigo criar ou corrigir.
+    public DiagnosisFeedback flagIncorrect(Long ticketId, String reason) {
+        Diagnosis diagnosis = diagnosisRepository.findByTicketId(ticketId)
+                .orElseThrow(() -> new DiagnosisNotFoundException(ticketId));
+        return feedbackRepository.save(DiagnosisFeedback.of(diagnosis, reason));
     }
 
     // Contrato enxuto da fila (estado + confiança). Vive aqui porque é o

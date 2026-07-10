@@ -24,6 +24,8 @@ O formato segue o padrão Keep a Changelog.
 - fluxo "apoiado" (RAG-lite): com match fraco na base, o artigo curado vai de material de apoio no prompt da IA via contrato `KnowledgeContext`, e o `source` marca `apoiado: <artigo> · via <modelo>`
 - tickets novos recebem status `NOVO` automaticamente na persistência
 - fila viva com tag do gate de IA, barra de prioridade, tempo de abertura e meta-grid do ticket; ao selecionar uma linha, o diagnóstico persistido é carregado sem nova chamada à IA
+- ações de ticket para aplicar resposta e resolver (`POST /tickets/{id}/reply`) ou escalar para atendimento humano (`POST /tickets/{id}/escalate`)
+- feedback de diagnóstico incorreto (`POST /tickets/{id}/diagnosis/feedback`) com snapshot imutável do diagnóstico visto pelo técnico
 
 ### Changed
 - clipper desacoplado do módulo ticket via contrato `DiagnosticRequest`

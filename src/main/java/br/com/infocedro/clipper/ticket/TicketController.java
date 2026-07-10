@@ -1,7 +1,9 @@
 package br.com.infocedro.clipper.ticket;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import br.com.infocedro.clipper.clipper.ClipperAgent;
+import br.com.infocedro.clipper.clipper.DiagnosisFeedback;
 import br.com.infocedro.clipper.clipper.DiagnosticRequest;
 import br.com.infocedro.clipper.clipper.DiagnosticResult;
 
@@ -62,6 +65,47 @@ public class TicketController {
         DiagnosticResult diagnosis = clipperAgent.analyze(ticket.getId(), request);
 
         return Map.of("diagnosis", diagnosis);
+    }
+
+    // ---- Ações do painel (rodada B3) ----
+
+    // "Aplicar como resposta": o texto (em geral o diagnóstico do Clipper,
+    // mas a API aceita qualquer resposta) vai pro solicitante e o chamado
+    // encerra como RESOLVIDO. Resposta vazia é 400.
+    @PostMapping("/tickets/{id}/reply")
+    public Ticket reply(@PathVariable Long id, @RequestBody ReplyRequest request) {
+        return ticketService.reply(id, request.response());
+    }
+
+    // "Escalar para humano": marca o chamado como ESCALADO. Sem corpo —
+    // a nota de escalonamento entra quando existir fila de N2 pra lê-la.
+    @PostMapping("/tickets/{id}/escalate")
+    public Ticket escalate(@PathVariable Long id) {
+        return ticketService.escalate(id);
+    }
+
+    // "Marcar diagnóstico incorreto": registra o feedback (módulo clipper)
+    // com snapshot do diagnóstico atual. Valida o ticket ANTES pra manter a
+    // semântica dos status: 404 = ticket não existe, 409 = existe mas nunca
+    // foi diagnosticado. Devolve só o recibo — a entidade não sai pela API.
+    @PostMapping("/tickets/{id}/diagnosis/feedback")
+    public ResponseEntity<FeedbackReceipt> flagIncorrect(
+            @PathVariable Long id, @RequestBody(required = false) FeedbackRequest request) {
+        ticketService.findById(id);
+        DiagnosisFeedback feedback = clipperAgent.flagIncorrect(id, request != null ? request.reason() : null);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new FeedbackReceipt(feedback.getId(), feedback.getCreatedAt()));
+    }
+
+    // DTOs de entrada/saída das ações — vivem na borda porque só existem
+    // pra dar forma ao JSON; nenhum módulo interno os conhece.
+    public record ReplyRequest(String response) {
+    }
+
+    public record FeedbackRequest(String reason) {
+    }
+
+    public record FeedbackReceipt(Long feedbackId, Instant createdAt) {
     }
 
     @GetMapping("/tickets/{id}/diagnosis")

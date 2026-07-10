@@ -2,6 +2,7 @@ package br.com.infocedro.clipper.ticket;
 
 import java.time.Instant;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,6 +29,13 @@ public class Ticket {
     private String routine;
 
     private Instant createdAt;
+
+    // A resposta aplicada ao solicitante (ação "aplicar como resposta" do
+    // console). TEXT desde o nascimento: em geral é o diagnóstico inteiro,
+    // que estoura fácil os 255 do VARCHAR default — e o ddl-auto=update
+    // não alarga coluna depois (mesma lição do Diagnosis).
+    @Column(columnDefinition = "TEXT")
+    private String response;
 
     public Ticket() {
     }
@@ -109,5 +117,13 @@ public class Ticket {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public String getResponse() {
+        return response;
+    }
+
+    public void setResponse(String response) {
+        this.response = response;
     }
 }
