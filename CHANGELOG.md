@@ -48,3 +48,4 @@ O formato segue o padrão Keep a Changelog.
 - `moduleResolution` do tsconfig do frontend ajustado para `Bundler`
 - busca de ticket inexistente passa a responder `404` em vez de `500`
 - busca da base de conhecimento não casa mais por pedaço de keyword (token "144" não ancora mais no artigo da rotina 1443) — o ponto só vale se o token for palavra inteira das keywords
+- títulos e descrições longos da fila passam a truncar com reticências sem invadir o badge de status

@@ -239,10 +239,12 @@ body { margin: 0; }
 .tid { font-family: var(--font-mono); font-size: 12.5px; color: var(--text-faint); }
 .q-main { min-width: 0; }
 .q-title {
+  display: block;
   font-weight: 600; font-size: 13.5px; color: var(--text);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .q-sub {
+  display: block;
   font-size: 12px; color: var(--text-muted); margin-top: 2px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
