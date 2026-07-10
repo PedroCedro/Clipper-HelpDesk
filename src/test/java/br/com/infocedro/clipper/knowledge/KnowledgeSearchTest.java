@@ -33,6 +33,7 @@ class KnowledgeSearchTest {
     // curadoria mudou.
     private KnowledgeArticle artigo1443;
     private KnowledgeArticle artigo2097;
+    private KnowledgeArticle artigo1360;
 
     @BeforeEach
     void setUp() {
@@ -40,8 +41,10 @@ class KnowledgeSearchTest {
                 "1443, cupom fiscal, vendas presas, nfc-e, 2097");
         artigo2097 = artigo(2L, "Como processar cupom fiscal em contingência",
                 "2097, contingência, contingencia, cupom fiscal, nfc-e, a enviar, dpec");
+        artigo1360 = artigo(3L, "Devolução de venda em contingência",
+                "1360, devolução, nf-e não consta, nf-e nao consta, mercadoria, sefaz");
 
-        List<KnowledgeArticle> base = List.of(artigo1443, artigo2097);
+        List<KnowledgeArticle> base = List.of(artigo1443, artigo2097, artigo1360);
 
         repository = mock(KnowledgeRepository.class);
         // Emula findByKeywordsContainingIgnoreCase: substring, sem caixa.
@@ -110,6 +113,15 @@ class KnowledgeSearchTest {
         // O token só vale se for palavra INTEIRA das keywords — aqui nenhuma
         // palavra do ticket é keyword, então nem match fraco pode haver.
         Optional<KnowledgeMatch> hit = search.search("erro estranho na rotina 144");
+
+        assertTrue(hit.isEmpty());
+    }
+
+    @Test
+    void stopwordNaoSozinhaNaoPontua() {
+        // "nao" existe nas keywords do artigo 1360, mas é ruído linguístico:
+        // sem outro termo de domínio, nem match fraco deve ser produzido.
+        Optional<KnowledgeMatch> hit = search.search("impressora nao liga");
 
         assertTrue(hit.isEmpty());
     }

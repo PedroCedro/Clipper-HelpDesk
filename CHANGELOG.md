@@ -51,3 +51,4 @@ O formato segue o padrão Keep a Changelog.
 - busca da base de conhecimento não casa mais por pedaço de keyword (token "144" não ancora mais no artigo da rotina 1443) — o ponto só vale se o token for palavra inteira das keywords
 - títulos e descrições longos da fila passam a truncar com reticências sem invadir o badge de status
 - tickets legados com status nulo exibem um rótulo neutro na fila e no detalhe
+- busca da base ignora stopwords mínimas para palavras como `não` não criarem matches artificiais

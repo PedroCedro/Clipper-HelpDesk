@@ -21,6 +21,7 @@ public class KnowledgeSearch {
     // sozinho ele não sustenta o selo "ancorado", mas jogar fora seria
     // desperdiçar a pista. É o botão que separa lookup de RAG.
     private static final int MIN_TOKEN_HITS = 2;
+    private static final Set<String> STOPWORDS = Set.of("nao", "não", "para", "com");
 
     private final KnowledgeRepository repository;
 
@@ -65,12 +66,13 @@ public class KnowledgeSearch {
                                 : KnowledgeMatch.Strength.WEAK));
     }
 
-    // "Feio primeiro": minúsculas, quebra em palavras, descarta tokens curtos.
-    // Ainda SEM stopwords / normalização de acento — refina quando um teste quebrar.
+    // Minúsculas, quebra em palavras e descarta tokens curtos ou sem valor
+    // semântico. A lista é curta de propósito: termos de domínio não podem
+    // desaparecer do placar por uma filtragem agressiva.
     private Set<String> tokenize(String text) {
         Set<String> tokens = new HashSet<>();
         for (String raw : text.toLowerCase().split("[^\\p{L}\\p{N}]+")) {
-            if (raw.length() >= 3) {
+            if (raw.length() >= 3 && !STOPWORDS.contains(raw)) {
                 tokens.add(raw);
             }
         }
