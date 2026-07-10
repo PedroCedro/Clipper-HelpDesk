@@ -10,7 +10,7 @@ export type Ticket = {
   id: number;
   title: string;
   description: string;
-  status: string;
+  status: string | null;
 };
 
 // Os três estados do gate — espelham o enum Grounding.State do backend.

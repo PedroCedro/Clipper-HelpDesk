@@ -22,6 +22,7 @@ O formato segue o padrão Keep a Changelog.
 - busca por palavra-chave na base de conhecimento (`KnowledgeSearch`), com limiar mínimo de tokens para considerar um match forte
 - testes de unidade do retrieval (`KnowledgeSearchTest`, trava o limiar de match forte) e do contrato do gate de grounding no motor (`DiagnosticEngineTest`: ancorado não chama IA; sem base a IA só recebe texto mascarado)
 - fluxo "apoiado" (RAG-lite): com match fraco na base, o artigo curado vai de material de apoio no prompt da IA via contrato `KnowledgeContext`, e o `source` marca `apoiado: <artigo> · via <modelo>`
+- tickets novos recebem status `NOVO` automaticamente na persistência
 
 ### Changed
 - clipper desacoplado do módulo ticket via contrato `DiagnosticRequest`
@@ -49,3 +50,4 @@ O formato segue o padrão Keep a Changelog.
 - busca de ticket inexistente passa a responder `404` em vez de `500`
 - busca da base de conhecimento não casa mais por pedaço de keyword (token "144" não ancora mais no artigo da rotina 1443) — o ponto só vale se o token for palavra inteira das keywords
 - títulos e descrições longos da fila passam a truncar com reticências sem invadir o badge de status
+- tickets legados com status nulo exibem um rótulo neutro na fila e no detalhe

@@ -26,7 +26,10 @@ export default function TicketDetail({ ticket, diag, onDiagnose }: TicketDetailP
     );
   }
 
-  const chip = statusChip[ticket.status] ?? { label: ticket.status, className: "b-neutro" };
+  const chip = (ticket.status ? statusChip[ticket.status] : undefined) ?? {
+    label: ticket.status ?? "—",
+    className: "b-neutro",
+  };
 
   return (
     <section className="detail" aria-label="Detalhe do ticket">

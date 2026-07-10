@@ -39,6 +39,9 @@ public class Ticket {
         if (createdAt == null) {
             createdAt = Instant.now();
         }
+        if (status == null) {
+            status = "NOVO";
+        }
     }
 
     public Ticket(Long id, String title, String description, String status) {

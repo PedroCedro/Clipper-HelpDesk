@@ -45,8 +45,8 @@ export default function TicketQueue({
         </p>
       ) : (
         tickets.map((ticket) => {
-          const badge = statusBadge[ticket.status] ?? {
-            label: ticket.status,
+          const badge = (ticket.status ? statusBadge[ticket.status] : undefined) ?? {
+            label: ticket.status ?? "—",
             className: "b-neutro",
           };
           return (
