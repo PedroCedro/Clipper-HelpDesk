@@ -7,6 +7,14 @@ O formato segue o padrão Keep a Changelog.
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [0.1.0] - 2026-07-10
+
+### Added
 - estrutura base do projeto Clipper Helpdesk
 - backend Spring Boot com endpoint `GET /api/health`
 - frontend React com componente placeholder do Clipper
