@@ -8,7 +8,8 @@ import org.springframework.web.util.HtmlUtils;
 /**
  * Converte o HTML recebido das fontes externas em texto adequado para busca e
  * curadoria. A classe não conhece TOTVS nem persistência, portanto pode ser
- * reutilizada por futuros adaptadores que entreguem conteúdo HTML.
+ * reutilizada por futuros adaptadores que entreguem conteúdo HTML. O catálogo
+ * possui extrator próprio porque seu texto é derivado novamente na importação.
  */
 @Component
 public class HtmlTextExtractor {
