@@ -70,3 +70,78 @@ export type TicketActions = {
   onEscalate: (id: number) => Promise<void>;
   onFlagIncorrect: (id: number, reason: string | null) => Promise<void>;
 };
+
+export type CurationStatus =
+  | "ABERTO"
+  | "COM_CANDIDATOS"
+  | "RASCUNHO"
+  | "EM_REVISAO"
+  | "PUBLICADO"
+  | "DESCARTADO";
+
+export type CurationCaseSummary = {
+  id: number;
+  originType: "TICKET" | "FEEDBACK" | "MANUAL";
+  originReference: string | null;
+  status: CurationStatus;
+  reason: string;
+  author: string;
+  candidateCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CurationCandidate = {
+  id: number;
+  documentId: number;
+  title: string;
+  module: string | null;
+  sourceLabel: string;
+  sourceUrl: string | null;
+  author: string;
+  reason: string;
+  createdAt: string;
+};
+
+export type CurationTransition = {
+  id: number;
+  fromStatus: CurationStatus | null;
+  toStatus: CurationStatus;
+  actor: string;
+  reason: string;
+  createdAt: string;
+};
+
+export type CurationCandidateEvent = {
+  id: number;
+  documentId: number;
+  eventType: "ADDED" | "REMOVED";
+  actor: string;
+  reason: string;
+  createdAt: string;
+};
+
+export type CurationCaseDetail = CurationCaseSummary & {
+  candidates: CurationCandidate[];
+  transitions: CurationTransition[];
+  candidateEvents: CurationCandidateEvent[];
+};
+
+export type RawSearchItem = {
+  id: number;
+  externalId: string;
+  title: string;
+  module: string | null;
+  score: number;
+  matchReasons: string[];
+  snippet: string;
+  sourceUrl: string | null;
+  sourceUpdatedAt: string | null;
+};
+
+export type RawSearchPage = {
+  items: RawSearchItem[];
+  page: number;
+  size: number;
+  total: number;
+};

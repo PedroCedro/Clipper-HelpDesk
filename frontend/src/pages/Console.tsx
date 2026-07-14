@@ -10,7 +10,9 @@ import type { DiagnoseState, DiagnosticResult, Ticket, TicketActions } from "../
 // Página do console: DONA de todo o estado (tickets, seleção, busca,
 // diagnósticos). Os componentes abaixo dela são apresentação — mesma
 // filosofia do backend: um orquestrador magro, peças pequenas.
-export default function Console() {
+type ConsoleProps = { onOpenCuration: () => void };
+
+export default function Console({ onOpenCuration }: ConsoleProps) {
   const [theme, setTheme] = useTheme();
 
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -209,7 +211,7 @@ export default function Console() {
 
   return (
     <div className="app">
-      <Sidebar ticketCount={tickets.length} />
+      <Sidebar ticketCount={tickets.length} active="tickets" onOpenCuration={onOpenCuration} />
 
       <div className="workspace">
         <Topbar

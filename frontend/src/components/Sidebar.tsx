@@ -3,9 +3,19 @@
 // .soon) de propósito — mostrar o mapa do produto sem fingir navegação.
 type SidebarProps = {
   ticketCount: number;
+  curationCount?: number;
+  active: "tickets" | "curation";
+  onOpenTickets?: () => void;
+  onOpenCuration?: () => void;
 };
 
-export default function Sidebar({ ticketCount }: SidebarProps) {
+export default function Sidebar({
+  ticketCount,
+  curationCount = 0,
+  active,
+  onOpenTickets,
+  onOpenCuration,
+}: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -33,10 +43,10 @@ export default function Sidebar({ ticketCount }: SidebarProps) {
 
       <nav className="nav">
         <div className="nav-label">Atendimento</div>
-        <div className="nav-item active">
+        <button className={`nav-item ${active === "tickets" ? "active" : ""}`} onClick={onOpenTickets}>
           <span className="ico">▤</span> Fila de atendimento
           <span className="count">{ticketCount}</span>
-        </div>
+        </button>
         <div className="nav-item soon" title="Em breve">
           <span className="ico">◔</span> Meus tickets
         </div>
@@ -45,6 +55,10 @@ export default function Sidebar({ ticketCount }: SidebarProps) {
         </div>
 
         <div className="nav-label">Clipper</div>
+        <button className={`nav-item ${active === "curation" ? "active" : ""}`} onClick={onOpenCuration}>
+          <span className="ico">◇</span> Curadoria
+          <span className="count">{curationCount}</span>
+        </button>
         <div className="nav-item soon" title="Em breve">
           <span className="ico">◈</span> Base de conhecimento
         </div>
