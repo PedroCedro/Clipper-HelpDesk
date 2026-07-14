@@ -45,6 +45,14 @@ temp.ps1
 *.local
 /local/
 
+# Instruções de assistentes de IA e configuração local (ficam só na máquina)
+CLAUDE.md
+AGENTS.md
+.claude/
+
+# Dados brutos coletados da TOTVS (retenção a decidir na etapa C0 — não versionar por ora)
+/src/main/java/br/com/infocedro/clipper/collector/data/
+
 # Banco H2 de desenvolvimento (arquivo local, não versionar)
 /data/
 
