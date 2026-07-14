@@ -94,4 +94,11 @@ public class RawKnowledgeDocument {
     public String getRoutinesText() { return routinesText; }
     public String getErrorCodesText() { return errorCodesText; }
     public String getContentHash() { return contentHash; }
+
+    public String getScope() { return scope; }
+    public String getModule() { return module; }
+    public String getSourceUrl() { return sourceUrl; }
+    public OffsetDateTime getSourceCreatedAt() { return sourceCreatedAt; }
+    public OffsetDateTime getSourceUpdatedAt() { return sourceUpdatedAt; }
+    public OffsetDateTime getCollectedAt() { return collectedAt; }
 }

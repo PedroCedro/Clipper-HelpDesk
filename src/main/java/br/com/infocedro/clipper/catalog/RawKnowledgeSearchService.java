@@ -56,6 +56,12 @@ public class RawKnowledgeSearchService {
         return new RawSearchPage(List.copyOf(ranked.subList(from, to)), query.page(), query.size(), ranked.size());
     }
 
+    public RawDocumentDetail findDetail(Long id) {
+        return repository.findById(id)
+                .map(RawDocumentDetail::from)
+                .orElseThrow(() -> new RawDocumentNotFoundException(id));
+    }
+
     private RawSearchItem rank(
             RawSearchCandidate candidate,
             Set<String> tokens,
@@ -120,13 +126,13 @@ public class RawKnowledgeSearchService {
 
     private void validate(RawSearchQuery query) {
         if (query == null || query.text() == null || query.text().trim().length() < 2) {
-            throw new IllegalArgumentException("A busca deve ter ao menos 2 caracteres");
+            throw new InvalidRawSearchException("A busca deve ter ao menos 2 caracteres");
         }
         if (query.page() < 0) {
-            throw new IllegalArgumentException("A página não pode ser negativa");
+            throw new InvalidRawSearchException("A página não pode ser negativa");
         }
         if (query.size() < 1 || query.size() > MAX_PAGE_SIZE) {
-            throw new IllegalArgumentException("O tamanho da página deve ficar entre 1 e 50");
+            throw new InvalidRawSearchException("O tamanho da página deve ficar entre 1 e 50");
         }
     }
 
