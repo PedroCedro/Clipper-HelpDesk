@@ -168,6 +168,19 @@ class CurationCaseServiceTest {
                 .isInstanceOf(CurationCaseNotFoundException.class);
     }
 
+    @Test
+    void criaCasoDeTicketUmaVezEReutilizaNasRepeticoes() {
+        CurationCaseCreationResult first = service.createFromTicket(42L, "pedro", "Erro recorrente");
+        CurationCaseCreationResult repeated = service.createFromTicket(42L, "ana", "Reabrir investigação");
+
+        assertThat(first.created()).isTrue();
+        assertThat(repeated.created()).isFalse();
+        assertThat(repeated.curationCase().id()).isEqualTo(first.curationCase().id());
+        assertThat(caseRepository.count()).isEqualTo(1);
+        assertThat(transitionRepository
+                .findByCurationCase_IdOrderByCreatedAtAscIdAsc(first.curationCase().id())).hasSize(1);
+    }
+
     private CurationCaseSnapshot openManualCase() {
         return service.create(new CreateCurationCaseCommand(
                 CurationOriginType.MANUAL,

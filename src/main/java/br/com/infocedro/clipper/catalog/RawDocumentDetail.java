@@ -21,7 +21,7 @@ public record RawDocumentDetail(
 ) {
     public static RawDocumentDetail from(RawKnowledgeDocument document) {
         return new RawDocumentDetail(
-                document.getId(), document.getExternalId(), "Fonte oficial",
+                document.getId(), document.getExternalId(), RawSourceLabels.labelFor(document.getSourceType()),
                 document.getScope(), document.getModule(), document.getTitle(),
                 document.getTextContent(), document.getSourceUrl(), document.getLabelsText(),
                 document.getRoutinesText(), document.getErrorCodesText(),

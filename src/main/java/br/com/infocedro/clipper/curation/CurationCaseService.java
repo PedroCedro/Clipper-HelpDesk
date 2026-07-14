@@ -36,6 +36,17 @@ public class CurationCaseService {
     }
 
     @Transactional
+    public CurationCaseCreationResult createFromTicket(
+            Long ticketId, String actor, String reason) {
+        validateAudit(actor, reason);
+        String reference = String.valueOf(ticketId);
+        return caseRepository.findByOriginTypeAndOriginReference(CurationOriginType.TICKET, reference)
+                .map(existing -> new CurationCaseCreationResult(CurationCaseSnapshot.from(existing), false))
+                .orElseGet(() -> new CurationCaseCreationResult(create(new CreateCurationCaseCommand(
+                        CurationOriginType.TICKET, reference, actor, reason)), true));
+    }
+
+    @Transactional
     public CurationCaseSnapshot transition(Long id, TransitionCurationCaseCommand command) {
         validateAudit(command == null ? null : command.actor(), command == null ? null : command.reason());
         if (command.targetStatus() == null) {

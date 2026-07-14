@@ -3,6 +3,7 @@ package br.com.infocedro.clipper.curation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -181,8 +182,6 @@ class CurationCandidateServiceTest {
     void consultaDetalheComContagemVinculosEHistoricosOrdenados() {
         CurationCaseSnapshot curationCase = abreCaso();
         when(catalogPort.exists(101L)).thenReturn(true);
-        when(catalogPort.find(101L)).thenReturn(new CurationCatalogDocument(
-                101L, "Procedimento fiscal", "14-faturamento", "Fonte oficial", "https://fonte/101"));
         candidateService.add(curationCase.id(), 101L, comando("Associar"));
         candidateService.remove(curationCase.id(), 101L, comando("Remover"));
 
@@ -200,6 +199,24 @@ class CurationCandidateServiceTest {
                 .singleElement()
                 .extracting(CurationCaseSummary::candidateCount)
                 .isEqualTo(0L);
+    }
+
+    @Test
+    void consultaCandidatosAtivosEmUmUnicoLoteLeve() {
+        CurationCaseSnapshot curationCase = abreCaso();
+        when(catalogPort.exists(101L)).thenReturn(true);
+        when(catalogPort.exists(102L)).thenReturn(true);
+        candidateService.add(curationCase.id(), 101L, comando("Primeira fonte"));
+        candidateService.add(curationCase.id(), 102L, comando("Segunda fonte"));
+        when(catalogPort.findSummaries(List.of(101L, 102L))).thenReturn(List.of(
+                new CurationCatalogDocument(101L, "Fonte A", "fiscal", "Fonte oficial", "https://fonte/a"),
+                new CurationCatalogDocument(102L, "Fonte B", "vendas", "Fonte oficial", "https://fonte/b")));
+
+        CurationCaseDetail detail = queryService.detail(curationCase.id());
+
+        assertThat(detail.candidates()).extracting(CurationCandidateView::title)
+                .containsExactly("Fonte A", "Fonte B");
+        verify(catalogPort, times(1)).findSummaries(List.of(101L, 102L));
     }
 
     private CurationCaseSnapshot abreCaso() {

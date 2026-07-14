@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,20 @@ class RawKnowledgeSearchServiceTest {
 
         assertTrue(service.exists(7L));
         assertFalse(service.exists(null));
+    }
+
+    @Test
+    void buscaResumosEmLoteSemCarregarConteudo() {
+        RawDocumentSummaryProjection projection = mock(RawDocumentSummaryProjection.class);
+        when(projection.getId()).thenReturn(7L);
+        when(projection.getSourceType()).thenReturn("totvs-winthor");
+        when(projection.getTitle()).thenReturn("Rotina fiscal");
+        when(repository.findSummariesByIdIn(Set.of(7L))).thenReturn(List.of(projection));
+
+        List<RawDocumentSummary> summaries = service.findSummaries(Set.of(7L));
+
+        assertEquals(1, summaries.size());
+        assertEquals("Fonte oficial", summaries.getFirst().sourceLabel());
     }
 
     @Test

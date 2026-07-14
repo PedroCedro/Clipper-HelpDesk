@@ -11,6 +11,14 @@ public interface RawKnowledgeDocumentRepository extends JpaRepository<RawKnowled
 
     List<RawKnowledgeDocument> findBySourceTypeAndExternalIdIn(String sourceType, Collection<String> externalIds);
 
+    @Query("""
+            select d.id as id, d.sourceType as sourceType, d.title as title,
+                   d.module as module, d.sourceUrl as sourceUrl
+              from RawKnowledgeDocument d
+             where d.id in :ids
+            """)
+    List<RawDocumentSummaryProjection> findSummariesByIdIn(@Param("ids") Collection<Long> ids);
+
     // Uma consulta por token reduz o conjunto antes do ranking em Java. A
     // projeção evita transportar snapshots HTML que não participam da busca.
     @Query("""

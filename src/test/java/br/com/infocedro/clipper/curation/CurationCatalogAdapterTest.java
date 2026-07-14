@@ -5,7 +5,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import br.com.infocedro.clipper.catalog.RawKnowledgeSearchService;
-import br.com.infocedro.clipper.catalog.RawDocumentDetail;
+import br.com.infocedro.clipper.catalog.RawDocumentSummary;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class CurationCatalogAdapterTest {
@@ -28,12 +29,11 @@ class CurationCatalogAdapterTest {
     }
 
     @Test
-    void traduzDetalheParaContratoNeutroDaCuradoria() {
-        when(catalogService.findDetail(10L)).thenReturn(new RawDocumentDetail(
-                10L, "ext-10", "Fonte oficial", "fiscal", "14-faturamento", "Rotina fiscal",
-                "Texto", "https://fonte/10", "", "", "", null, null, null));
+    void traduzResumoLeveParaContratoNeutroDaCuradoria() {
+        when(catalogService.findSummaries(List.of(10L))).thenReturn(List.of(new RawDocumentSummary(
+                10L, "Rotina fiscal", "14-faturamento", "Fonte oficial", "https://fonte/10")));
 
-        CurationCatalogDocument document = adapter.find(10L);
+        CurationCatalogDocument document = adapter.findSummaries(List.of(10L)).getFirst();
 
         assertThat(document.title()).isEqualTo("Rotina fiscal");
         assertThat(document.sourceLabel()).isEqualTo("Fonte oficial");

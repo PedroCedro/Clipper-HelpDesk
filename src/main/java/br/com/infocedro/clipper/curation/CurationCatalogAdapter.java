@@ -1,5 +1,8 @@
 package br.com.infocedro.clipper.curation;
 
+import java.util.Collection;
+import java.util.List;
+
 import br.com.infocedro.clipper.catalog.RawKnowledgeSearchService;
 import org.springframework.stereotype.Component;
 
@@ -19,9 +22,10 @@ class CurationCatalogAdapter implements CurationCatalogPort {
     }
 
     @Override
-    public CurationCatalogDocument find(Long documentId) {
-        var detail = catalogService.findDetail(documentId);
-        return new CurationCatalogDocument(
-                detail.id(), detail.title(), detail.module(), detail.sourceLabel(), detail.sourceUrl());
+    public List<CurationCatalogDocument> findSummaries(Collection<Long> documentIds) {
+        return catalogService.findSummaries(documentIds).stream()
+                .map(detail -> new CurationCatalogDocument(
+                        detail.id(), detail.title(), detail.module(), detail.sourceLabel(), detail.sourceUrl()))
+                .toList();
     }
 }

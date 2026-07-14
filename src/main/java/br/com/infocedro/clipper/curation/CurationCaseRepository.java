@@ -15,6 +15,9 @@ interface CurationCaseRepository extends JpaRepository<CurationCase, Long> {
 
     List<CurationCase> findByStatusOrderByUpdatedAtDescIdDesc(CurationStatus status);
 
+    Optional<CurationCase> findByOriginTypeAndOriginReference(
+            CurationOriginType originType, String originReference);
+
     // Serializa mudanças de candidatos do mesmo caso para sustentar a
     // idempotência e a transição única do primeiro vínculo.
     @Lock(LockModeType.PESSIMISTIC_WRITE)

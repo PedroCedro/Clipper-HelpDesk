@@ -13,7 +13,10 @@ import jakarta.persistence.Table;
 
 /** Unidade de trabalho que conduz evidências brutas até conhecimento revisado. */
 @Entity
-@Table(name = "curation_case")
+// Referências nulas continuam permitindo vários casos MANUAL no H2/Postgres;
+// a restrição existe para origens externas identificáveis, como ticket.
+@Table(name = "curation_case", uniqueConstraints = @jakarta.persistence.UniqueConstraint(
+        name = "uk_curation_case_origin", columnNames = {"origin_type", "origin_reference"}))
 public class CurationCase {
 
     @Id

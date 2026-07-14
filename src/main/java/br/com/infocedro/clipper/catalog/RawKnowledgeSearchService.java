@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
@@ -65,6 +66,17 @@ public class RawKnowledgeSearchService {
     /** Confirma identidade sem carregar os campos TEXT usados apenas no detalhe. */
     public boolean exists(Long id) {
         return id != null && repository.existsById(id);
+    }
+
+    public List<RawDocumentSummary> findSummaries(Collection<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return repository.findSummariesByIdIn(ids).stream()
+                .map(item -> new RawDocumentSummary(
+                        item.getId(), item.getTitle(), item.getModule(),
+                        RawSourceLabels.labelFor(item.getSourceType()), item.getSourceUrl()))
+                .toList();
     }
 
     private RawSearchItem rank(

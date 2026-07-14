@@ -1,6 +1,9 @@
 package br.com.infocedro.clipper.curation;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,10 +44,14 @@ public class CurationQueryService {
     public CurationCaseDetail detail(Long id) {
         CurationCase curationCase = caseRepository.findById(id)
                 .orElseThrow(() -> new CurationCaseNotFoundException(id));
-        List<CurationCandidateView> candidates = candidateRepository
-                .findByCurationCase_IdOrderByCreatedAtAscIdAsc(id).stream()
-                .map(candidate -> CurationCandidateView.from(
-                        candidate, catalogPort.find(candidate.getDocumentId())))
+        var activeCandidates = candidateRepository.findByCurationCase_IdOrderByCreatedAtAscIdAsc(id);
+        Map<Long, CurationCatalogDocument> documents = activeCandidates.isEmpty()
+                ? Map.of()
+                : catalogPort.findSummaries(
+                                activeCandidates.stream().map(CurationCandidate::getDocumentId).toList()).stream()
+                        .collect(Collectors.toMap(CurationCatalogDocument::id, Function.identity()));
+        List<CurationCandidateView> candidates = activeCandidates.stream()
+                .map(candidate -> CurationCandidateView.from(candidate, requireDocument(documents, candidate)))
                 .toList();
         List<CurationTransitionView> transitions = transitionRepository
                 .findByCurationCase_IdOrderByCreatedAtAscIdAsc(id).stream()
@@ -59,6 +66,15 @@ public class CurationQueryService {
                 curationCase.getStatus(), curationCase.getReason(), curationCase.getAuthor(),
                 candidates.size(), curationCase.getCreatedAt(), curationCase.getUpdatedAt(),
                 candidates, transitions, events);
+    }
+
+    private CurationCatalogDocument requireDocument(
+            Map<Long, CurationCatalogDocument> documents, CurationCandidate candidate) {
+        CurationCatalogDocument document = documents.get(candidate.getDocumentId());
+        if (document == null) {
+            throw new CurationDocumentNotFoundException(candidate.getDocumentId());
+        }
+        return document;
     }
 
     private CurationCaseSummary summary(CurationCase curationCase) {

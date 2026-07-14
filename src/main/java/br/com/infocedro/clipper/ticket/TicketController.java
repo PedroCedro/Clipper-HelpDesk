@@ -15,6 +15,8 @@ import br.com.infocedro.clipper.clipper.ClipperAgent;
 import br.com.infocedro.clipper.clipper.DiagnosisFeedback;
 import br.com.infocedro.clipper.clipper.DiagnosticRequest;
 import br.com.infocedro.clipper.clipper.DiagnosticResult;
+import br.com.infocedro.clipper.curation.CurationCaseCreationResult;
+import br.com.infocedro.clipper.curation.CurationCaseService;
 
 @RestController
 @RequestMapping("/api")
@@ -22,10 +24,15 @@ public class TicketController {
 
     private final TicketService ticketService;
     private final ClipperAgent clipperAgent;
+    private final CurationCaseService curationCaseService;
 
-    public TicketController(TicketService ticketService, ClipperAgent clipperAgent) {
+    public TicketController(
+            TicketService ticketService,
+            ClipperAgent clipperAgent,
+            CurationCaseService curationCaseService) {
         this.ticketService = ticketService;
         this.clipperAgent = clipperAgent;
+        this.curationCaseService = curationCaseService;
     }
 
     @GetMapping("/health")
@@ -106,6 +113,19 @@ public class TicketController {
     }
 
     public record FeedbackReceipt(Long feedbackId, Instant createdAt) {
+    }
+
+    @PostMapping("/tickets/{id}/curation-case")
+    public ResponseEntity<CurationCaseCreationResult> sendToCuration(
+            @PathVariable Long id,
+            @org.springframework.web.bind.annotation.RequestHeader("X-Actor") String actor,
+            @RequestBody CurationRequest request) {
+        ticketService.findById(id);
+        CurationCaseCreationResult result = curationCaseService.createFromTicket(id, actor, request.reason());
+        return ResponseEntity.status(result.created() ? HttpStatus.CREATED : HttpStatus.OK).body(result);
+    }
+
+    public record CurationRequest(String reason) {
     }
 
     @GetMapping("/tickets/{id}/diagnosis")
