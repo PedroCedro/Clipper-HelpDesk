@@ -97,6 +97,10 @@ POST /api/tickets
 POST /api/tickets/{id}/diagnose
 GET  /api/raw-documents/search?q={texto}&page=0&size=20
 GET  /api/raw-documents/{id}
+GET  /api/curation-cases
+GET  /api/curation-cases/{id}
+POST /api/curation-cases/{id}/candidates
+POST /api/curation-cases/{id}/transitions
 ```
 
 ## Como executar o frontend
@@ -118,6 +122,12 @@ Observações de desenvolvimento local:
 - o frontend espera o backend em `http://localhost:8080`
 - o Vite faz proxy automático de `/api` para o backend durante `npm run dev`
 - se preferir chamar a API Spring diretamente no navegador, o backend libera CORS para `http://localhost:5173`
+
+A área **Curadoria** da sidebar oferece a primeira interface de investigação:
+fila de casos, filtro por etapa, busca em fontes oficiais, associação e remoção
+de candidatos, descarte e histórico. O operador é declaratório enquanto a
+autenticação não existe, fica salvo localmente no navegador e acompanha toda
+ação auditável.
 
 ## Como executar o coletor
 

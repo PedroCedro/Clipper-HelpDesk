@@ -15,6 +15,7 @@ O formato segue o padrão Keep a Changelog.
 - casos de curadoria com origem validada, máquina de estados e histórico auditável
 - candidatos de curadoria com associação idempotente e eventos auditáveis de adição e remoção
 - API interna de curadoria para casos, candidatos, transições e históricos
+- interface inicial de curadoria com fila, investigação de fontes e auditoria das ações
 
 ### Changed
 
