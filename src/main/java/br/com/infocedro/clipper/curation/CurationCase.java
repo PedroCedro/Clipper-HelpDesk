@@ -63,6 +63,11 @@ public class CurationCase {
         updatedAt = now;
     }
 
+    /** Marca mudança relevante no agregado mesmo quando a etapa permanece igual. */
+    void touch(OffsetDateTime now) {
+        updatedAt = now;
+    }
+
     private static String normalizeNullable(String value) {
         return value == null || value.isBlank() ? null : value.trim();
     }
