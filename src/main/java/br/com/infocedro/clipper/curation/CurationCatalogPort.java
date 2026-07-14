@@ -4,4 +4,6 @@ package br.com.infocedro.clipper.curation;
 public interface CurationCatalogPort {
 
     boolean exists(Long documentId);
+
+    CurationCatalogDocument find(Long documentId);
 }

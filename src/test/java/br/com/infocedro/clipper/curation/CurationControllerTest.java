@@ -69,7 +69,9 @@ class CurationControllerTest {
         when(queryService.detail(12L)).thenReturn(new CurationCaseDetail(
                 12L, CurationOriginType.MANUAL, null, CurationStatus.COM_CANDIDATOS,
                 "Investigar", "pedro", 1, now(), now(),
-                List.of(new CurationCandidateView(1L, 77L, "pedro", "Relevante", now())),
+                List.of(new CurationCandidateView(
+                        1L, 77L, "Rotina fiscal", "14-faturamento", "Fonte oficial",
+                        "https://fonte/77", "pedro", "Relevante", now())),
                 List.of(new CurationTransitionView(
                         2L, CurationStatus.ABERTO, CurationStatus.COM_CANDIDATOS,
                         "pedro", "Relevante", now())),
@@ -79,6 +81,8 @@ class CurationControllerTest {
         mockMvc.perform(get("/api/curation-cases/12"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.candidates[0].documentId").value(77))
+                .andExpect(jsonPath("$.candidates[0].sourceLabel").value("Fonte oficial"))
+                .andExpect(jsonPath("$.candidates[0].sourceType").doesNotExist())
                 .andExpect(jsonPath("$.transitions[0].toStatus").value("COM_CANDIDATOS"))
                 .andExpect(jsonPath("$.candidateEvents[0].eventType").value("ADDED"))
                 .andExpect(jsonPath("$.candidates[0].curationCase").doesNotExist());

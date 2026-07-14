@@ -49,7 +49,7 @@ class RawKnowledgeControllerTest {
     @Test
     void detalheNaoExpoeHtmlNemMetadataInterna() throws Exception {
         RawDocumentDetail detail = new RawDocumentDetail(
-                7L, "42", "totvs-winthor", "14-faturamento", "14-faturamento",
+                7L, "42", "Fonte oficial", "14-faturamento", "14-faturamento",
                 "Título", "Texto seguro", "https://fonte/42", "|fiscal|", "", "|1026|",
                 null, null, null);
         when(searchService.findDetail(7L)).thenReturn(detail);
@@ -57,6 +57,8 @@ class RawKnowledgeControllerTest {
         mockMvc.perform(get("/api/raw-documents/7"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.textContent").value("Texto seguro"))
+                .andExpect(jsonPath("$.sourceLabel").value("Fonte oficial"))
+                .andExpect(jsonPath("$.sourceType").doesNotExist())
                 .andExpect(jsonPath("$.htmlContent").doesNotExist())
                 .andExpect(jsonPath("$.metadataJson").doesNotExist());
     }

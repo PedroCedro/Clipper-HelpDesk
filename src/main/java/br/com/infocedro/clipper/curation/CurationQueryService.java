@@ -13,17 +13,20 @@ public class CurationQueryService {
     private final CurationCandidateRepository candidateRepository;
     private final CurationCaseTransitionRepository transitionRepository;
     private final CurationCandidateEventRepository eventRepository;
+    private final CurationCatalogPort catalogPort;
 
     public CurationQueryService(
             CurationCaseRepository caseRepository,
             CurationCandidateRepository candidateRepository,
             CurationCaseTransitionRepository transitionRepository,
-            CurationCandidateEventRepository eventRepository
+            CurationCandidateEventRepository eventRepository,
+            CurationCatalogPort catalogPort
     ) {
         this.caseRepository = caseRepository;
         this.candidateRepository = candidateRepository;
         this.transitionRepository = transitionRepository;
         this.eventRepository = eventRepository;
+        this.catalogPort = catalogPort;
     }
 
     @Transactional(readOnly = true)
@@ -40,7 +43,8 @@ public class CurationQueryService {
                 .orElseThrow(() -> new CurationCaseNotFoundException(id));
         List<CurationCandidateView> candidates = candidateRepository
                 .findByCurationCase_IdOrderByCreatedAtAscIdAsc(id).stream()
-                .map(CurationCandidateView::from)
+                .map(candidate -> CurationCandidateView.from(
+                        candidate, catalogPort.find(candidate.getDocumentId())))
                 .toList();
         List<CurationTransitionView> transitions = transitionRepository
                 .findByCurationCase_IdOrderByCreatedAtAscIdAsc(id).stream()

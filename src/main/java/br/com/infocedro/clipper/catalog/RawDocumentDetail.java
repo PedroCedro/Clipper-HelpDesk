@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 public record RawDocumentDetail(
         Long id,
         String externalId,
-        String sourceType,
+        String sourceLabel,
         String scope,
         String module,
         String title,
@@ -21,7 +21,7 @@ public record RawDocumentDetail(
 ) {
     public static RawDocumentDetail from(RawKnowledgeDocument document) {
         return new RawDocumentDetail(
-                document.getId(), document.getExternalId(), document.getSourceType(),
+                document.getId(), document.getExternalId(), "Fonte oficial",
                 document.getScope(), document.getModule(), document.getTitle(),
                 document.getTextContent(), document.getSourceUrl(), document.getLabelsText(),
                 document.getRoutinesText(), document.getErrorCodesText(),

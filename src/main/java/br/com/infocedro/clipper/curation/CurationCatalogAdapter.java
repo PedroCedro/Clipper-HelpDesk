@@ -17,4 +17,11 @@ class CurationCatalogAdapter implements CurationCatalogPort {
     public boolean exists(Long documentId) {
         return catalogService.exists(documentId);
     }
+
+    @Override
+    public CurationCatalogDocument find(Long documentId) {
+        var detail = catalogService.findDetail(documentId);
+        return new CurationCatalogDocument(
+                detail.id(), detail.title(), detail.module(), detail.sourceLabel(), detail.sourceUrl());
+    }
 }

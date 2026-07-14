@@ -181,6 +181,8 @@ class CurationCandidateServiceTest {
     void consultaDetalheComContagemVinculosEHistoricosOrdenados() {
         CurationCaseSnapshot curationCase = abreCaso();
         when(catalogPort.exists(101L)).thenReturn(true);
+        when(catalogPort.find(101L)).thenReturn(new CurationCatalogDocument(
+                101L, "Procedimento fiscal", "14-faturamento", "Fonte oficial", "https://fonte/101"));
         candidateService.add(curationCase.id(), 101L, comando("Associar"));
         candidateService.remove(curationCase.id(), 101L, comando("Remover"));
 
