@@ -95,6 +95,7 @@ GET  /api/health
 GET  /api/tickets
 POST /api/tickets
 POST /api/tickets/{id}/diagnose
+POST /api/tickets/{id}/curation-case
 GET  /api/raw-documents/search?q={texto}&page=0&size=20
 GET  /api/raw-documents/{id}
 GET  /api/curation-cases
@@ -128,6 +129,8 @@ fila de casos, filtro por etapa, busca em fontes oficiais, associação e remoç
 de candidatos, descarte e histórico. O operador é declaratório enquanto a
 autenticação não existe, fica salvo localmente no navegador e acompanha toda
 ação auditável.
+No detalhe do ticket, **Enviar para curadoria** abre o fluxo de confirmação,
+cria ou reutiliza o caso correspondente e navega diretamente para ele.
 
 ## Como executar o coletor
 

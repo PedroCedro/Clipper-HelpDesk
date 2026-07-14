@@ -16,9 +16,12 @@ O formato segue o padrão Keep a Changelog.
 - candidatos de curadoria com associação idempotente e eventos auditáveis de adição e remoção
 - API interna de curadoria para casos, candidatos, transições e históricos
 - interface inicial de curadoria com fila, investigação de fontes e auditoria das ações
+- envio idempotente de tickets para curadoria com abertura automática do caso
 
 ### Changed
 
+- detalhe da curadoria passa a carregar candidatos por projeção leve em lote
+- sidebar compartilha a contagem real de tickets entre atendimento e curadoria
 - fluxo de coleta generalizado por `KnowledgeSource`, mantendo TOTVS/WinThor como adaptador
 - coletor TOTVS separado em cliente HTTP, transformação tipada e extração segura de HTML
 - saída bruta organizada por fonte, módulo e execução em `var/knowledge/raw`
