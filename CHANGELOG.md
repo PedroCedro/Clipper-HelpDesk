@@ -8,10 +8,15 @@ O formato segue o padrão Keep a Changelog.
 
 ### Added
 
+- catálogo versionado de módulos TOTVS/WinThor e manifesto de coleta com hashes SHA-256
+
 ### Changed
 
 - fluxo de coleta generalizado por `KnowledgeSource`, mantendo TOTVS/WinThor como adaptador
 - coletor TOTVS separado em cliente HTTP, transformação tipada e extração segura de HTML
+- saída bruta organizada por fonte, módulo e execução em `var/knowledge/raw`
+- script de coleta com seleção por `-Modulo` ou execução completa por `-All`
+- persistência H2 paralela removida do coletor; o banco pesquisável ficará a cargo do importador
 
 ### Fixed
 

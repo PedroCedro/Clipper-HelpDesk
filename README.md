@@ -117,9 +117,38 @@ Observações de desenvolvimento local:
 - o Vite faz proxy automático de `/api` para o backend durante `npm run dev`
 - se preferir chamar a API Spring diretamente no navegador, o backend libera CORS para `http://localhost:5173`
 
+## Como executar o coletor
+
+O coletor fica desligado durante a execução normal da API. Cada rodada grava
+JSONL e um manifesto com hashes em `var/knowledge/raw/<fonte>/<módulo>/<execução>/`.
+Os arquivos brutos são locais e não alimentam o diagnóstico antes da curadoria.
+
+Coletar um módulo com limites de desenvolvimento:
+
+```powershell
+.\src\main\java\br\com\infocedro\clipper\collector\run-crawler.ps1 `
+  -Modulo 14-faturamento -MaxSections 1 -MaxArticles 10
+```
+
+Coletar todos os módulos catalogados:
+
+```powershell
+.\src\main\java\br\com\infocedro\clipper\collector\run-crawler.ps1 -All
+```
+
+O catálogo de módulos fica em
+`src/main/resources/collector/totvs-winthor-modules.yaml`. A busca exploratória
+na coleta mais recente de um módulo pode ser feita com:
+
+```powershell
+.\src\main\java\br\com\infocedro\clipper\collector\search-local.ps1 `
+  -Modulo 14-faturamento -Query "rejeição 1026"
+```
+
 ## Estado atual
 
 - o backend roda na raiz do projeto com `pom.xml`, `src/` e `mvnw.cmd`
 - o frontend foi consolidado em `frontend/`
 - o diagnóstico já roda via provider de IA configurável, combinado com as regras determinísticas
+- o coletor organiza fontes brutas por módulo e registra manifesto auditável com SHA-256
 - a pasta antiga `Clipper-HelpDesk` foi descontinuada como base principal
