@@ -8,7 +8,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -96,7 +95,7 @@ public class TotvsWinthorCollectorDatabase {
             }
         }
 
-        public void upsertSection(Map<String, Object> record) throws SQLException {
+        public void upsertSection(TotvsSectionRecord record) throws SQLException {
             if (connection == null) {
                 return;
             }
@@ -108,18 +107,18 @@ public class TotvsWinthorCollectorDatabase {
                     KEY(id)
                     VALUES (?, ?, ?, ?, ?, ?, ?)
                     """)) {
-                statement.setLong(1, asLong(record.get("id")));
-                statement.setString(2, asString(record.get("nome")));
-                statement.setString(3, asString(record.get("url")));
-                statement.setLong(4, asLong(record.get("category_id")));
-                setNullableLong(statement, 5, record.get("parent_section_id"));
-                statement.setString(6, asString(record.get("caminho")));
-                statement.setString(7, asString(record.get("collected_at")));
+                statement.setLong(1, record.id());
+                statement.setString(2, record.name());
+                statement.setString(3, record.url());
+                statement.setLong(4, record.categoryId());
+                setNullableLong(statement, 5, record.parentSectionId());
+                statement.setString(6, record.path());
+                statement.setString(7, record.collectedAt());
                 statement.executeUpdate();
             }
         }
 
-        public void upsertArticle(Map<String, Object> record) throws SQLException, JsonProcessingException {
+        public void upsertArticle(TotvsArticleRecord record) throws SQLException, JsonProcessingException {
             if (connection == null) {
                 return;
             }
@@ -132,19 +131,19 @@ public class TotvsWinthorCollectorDatabase {
                     KEY(id)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """)) {
-                statement.setLong(1, asLong(record.get("id")));
-                statement.setString(2, asString(record.get("url")));
-                statement.setString(3, asString(record.get("titulo")));
-                statement.setLong(4, asLong(record.get("secao_id")));
-                statement.setString(5, asString(record.get("secao_nome")));
-                statement.setString(6, asString(record.get("secao_caminho")));
-                statement.setString(7, objectMapper.writeValueAsString(record.get("labels")));
-                statement.setString(8, asString(record.get("conteudo_texto")));
-                statement.setString(9, asString(record.get("conteudo_html")));
-                statement.setString(10, asString(record.get("criado_em")));
-                statement.setString(11, asString(record.get("atualizado_em")));
-                statement.setString(12, asString(record.get("source_api")));
-                statement.setString(13, asString(record.get("collected_at")));
+                statement.setLong(1, record.id());
+                statement.setString(2, record.url());
+                statement.setString(3, record.title());
+                statement.setLong(4, record.sectionId());
+                statement.setString(5, record.sectionName());
+                statement.setString(6, record.sectionPath());
+                statement.setString(7, objectMapper.writeValueAsString(record.labels()));
+                statement.setString(8, record.textContent());
+                statement.setString(9, record.htmlContent());
+                statement.setString(10, record.createdAt());
+                statement.setString(11, record.updatedAt());
+                statement.setString(12, record.sourceApi());
+                statement.setString(13, record.collectedAt());
                 statement.executeUpdate();
             }
         }
@@ -171,8 +170,5 @@ public class TotvsWinthorCollectorDatabase {
             return Long.parseLong(String.valueOf(value));
         }
 
-        private static String asString(Object value) {
-            return value == null ? null : String.valueOf(value);
-        }
     }
 }

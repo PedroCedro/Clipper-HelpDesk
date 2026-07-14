@@ -10,7 +10,12 @@ O formato segue o padrão Keep a Changelog.
 
 ### Changed
 
+- fluxo de coleta generalizado por `KnowledgeSource`, mantendo TOTVS/WinThor como adaptador
+- coletor TOTVS separado em cliente HTTP, transformação tipada e extração segura de HTML
+
 ### Fixed
+
+- coleta protegida contra labels inválidas, entidades HTML malformadas e requisições sem timeout
 
 ## [0.1.0] - 2026-07-10
 

@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 public class TotvsWinthorCrawlerRunner implements ApplicationRunner {
 
     private final TotvsWinthorCollectorProperties properties;
-    private final TotvsWinthorCrawler crawler;
+    private final KnowledgeCrawler crawler;
     private final ConfigurableApplicationContext context;
 
     public TotvsWinthorCrawlerRunner(
             TotvsWinthorCollectorProperties properties,
-            TotvsWinthorCrawler crawler,
+            KnowledgeCrawler crawler,
             ConfigurableApplicationContext context
     ) {
         this.properties = properties;
@@ -30,13 +30,13 @@ public class TotvsWinthorCrawlerRunner implements ApplicationRunner {
             return;
         }
 
-        TotvsWinthorCrawler.CrawlSummary summary = crawler.crawl(properties);
+        CollectionSummary summary = crawler.crawl(TotvsWinthorSource.TYPE);
         System.out.printf(
-                "TOTVS Winthor crawl concluido: %d secoes, %d artigos. Arquivos: %s e %s%n",
-                summary.sections(),
-                summary.articles(),
-                summary.sectionsFile(),
-                summary.articlesFile()
+                "Coleta %s concluída: %d seções, %d artigos. Saída: %s%n",
+                summary.sourceType(),
+                summary.containers(),
+                summary.documents(),
+                summary.outputLocation()
         );
         context.close();
     }
