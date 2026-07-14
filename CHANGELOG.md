@@ -12,6 +12,7 @@ O formato segue o padrão Keep a Changelog.
 - catálogo persistente de documentos brutos com adapter, fingerprint e importação idempotente
 - busca paginada do catálogo bruto com ranking e justificativas de correspondência
 - endpoints somente leitura para busca e detalhe de documentos brutos
+- casos de curadoria com origem validada, máquina de estados e histórico auditável
 
 ### Changed
 
