@@ -28,4 +28,21 @@ class RawKnowledgeDocumentRepositoryTest {
         assertEquals(1, result.size());
         assertEquals("abc", result.getFirst().getExternalId());
     }
+
+    @Test
+    void pesquisaComProjecaoSemCarregarSnapshotHtml() {
+        RawDocumentCandidate candidate = new RawDocumentCandidate(
+                "totvs-winthor", "42", "14-faturamento", "14-faturamento",
+                "Rejeição 1026", "Falha fiscal", "<p>HTML grande</p>", "https://fonte/42",
+                "|fiscal|", "", "|1026|", "{}", null,
+                OffsetDateTime.parse("2026-01-02T10:00:00Z"), OffsetDateTime.now());
+        repository.saveAndFlush(RawKnowledgeDocument.create(candidate, "b".repeat(64), OffsetDateTime.now()));
+
+        List<RawSearchCandidate> result = repository.searchCandidates(
+                "1026", "totvs-winthor", "14-faturamento");
+
+        assertEquals(1, result.size());
+        assertEquals("42", result.getFirst().getExternalId());
+        assertEquals("|1026|", result.getFirst().getErrorCodesText());
+    }
 }

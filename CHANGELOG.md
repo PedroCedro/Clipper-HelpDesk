@@ -10,6 +10,7 @@ O formato segue o padrão Keep a Changelog.
 
 - catálogo versionado de módulos TOTVS/WinThor e manifesto de coleta com hashes SHA-256
 - catálogo persistente de documentos brutos com adapter, fingerprint e importação idempotente
+- busca paginada do catálogo bruto com ranking e justificativas de correspondência
 
 ### Changed
 
