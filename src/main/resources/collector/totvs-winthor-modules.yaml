@@ -1,0 +1,24 @@
+- key: 01-plano-de-voo
+  rootSectionId: 360003678792
+  name: "1 - Plano de Voo"
+- key: 03-vendas
+  rootSectionId: 360003677031
+  name: "3 - Vendas"
+- key: 11-adm-interna-estoque
+  rootSectionId: 360003678772
+  name: "11 - Adm. Interna do Estoque"
+- key: 13-recebimento-mercadoria
+  rootSectionId: 360003678732
+  name: "13 - Recebimento de Mercadoria"
+- key: 14-faturamento
+  rootSectionId: 360003676931
+  name: "14 - Faturamento"
+- key: 20-autosservico
+  rootSectionId: 360003679032
+  name: "20 - Autosserviço"
+- key: pdv-supermercados
+  rootSectionId: 32052796977047
+  name: "PDV Supermercados"
+- key: reforma-tributaria-winthor
+  rootSectionId: 35204761737239
+  name: "Reforma Tributária - WinThor"

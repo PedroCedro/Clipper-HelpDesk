@@ -81,6 +81,18 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+			<!-- VERSION é a fonte única usada também pelos manifestos de coleta. -->
+			<resource>
+				<directory>${project.basedir}</directory>
+				<includes>
+					<include>VERSION</include>
+				</includes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

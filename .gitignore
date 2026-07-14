@@ -44,6 +44,7 @@ temp.ps1
 # Local-only docs (governança/notas que ficam só na máquina)
 *.local
 /local/
+/var/
 
 # Instruções de assistentes de IA e configuração local (ficam só na máquina)
 CLAUDE.md

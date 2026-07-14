@@ -6,7 +6,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -35,30 +34,30 @@ public class TotvsWinthorCrawler {
     private final ObjectMapper objectMapper;
     private final TotvsHelpCenterClient client;
     private final TotvsWinthorDocumentMapper documentMapper;
-    private final TotvsWinthorCollectorDatabase collectorDatabase;
 
     public TotvsWinthorCrawler(
             ObjectMapper objectMapper,
             TotvsHelpCenterClient client,
-            TotvsWinthorDocumentMapper documentMapper,
-            TotvsWinthorCollectorDatabase collectorDatabase
+            TotvsWinthorDocumentMapper documentMapper
     ) {
         this.objectMapper = objectMapper;
         this.client = client;
         this.documentMapper = documentMapper;
-        this.collectorDatabase = collectorDatabase;
     }
 
-    public CrawlSummary crawl(TotvsWinthorCollectorProperties properties)
-            throws IOException, InterruptedException, SQLException {
-        Files.createDirectories(properties.getOutputDir());
-        Path sectionsFile = properties.getOutputDir().resolve("sections.jsonl");
-        Path articlesFile = properties.getOutputDir().resolve("artigos.jsonl");
-        Path summaryFile = properties.getOutputDir().resolve("crawl-summary.json");
+    public CrawlSummary crawl(
+            TotvsWinthorCollectorProperties properties,
+            TotvsWinthorModule module,
+            Path outputDirectory,
+            OffsetDateTime startedAt
+    ) throws IOException, InterruptedException {
+        Files.createDirectories(outputDirectory);
+        Path sectionsFile = outputDirectory.resolve("sections.jsonl");
+        Path articlesFile = outputDirectory.resolve("documents.jsonl");
 
         Set<Long> visitedSections = new HashSet<>();
         Set<Long> visitedArticles = new HashSet<>();
-        SectionCursor root = fetchRootSection(properties);
+        SectionCursor root = fetchRootSection(properties, module);
         Map<Long, List<SectionCursor>> children = loadSectionTree(properties, root);
         Queue<SectionCursor> pending = new ArrayDeque<>();
         pending.add(root);
@@ -66,8 +65,7 @@ public class TotvsWinthorCrawler {
         int articleCount = 0;
 
         try (BufferedWriter sectionWriter = Files.newBufferedWriter(sectionsFile, StandardCharsets.UTF_8);
-             BufferedWriter articleWriter = Files.newBufferedWriter(articlesFile, StandardCharsets.UTF_8);
-             TotvsWinthorCollectorDatabase.DatabaseSession database = collectorDatabase.open(properties)) {
+             BufferedWriter articleWriter = Files.newBufferedWriter(articlesFile, StandardCharsets.UTF_8)) {
             // Busca em largura mantém a ordem previsível e permite interromper
             // a coleta por limite sem perder a noção da hierarquia visitada.
             while (!pending.isEmpty() && !limitReached(sectionCount, properties.getMaxSections())) {
@@ -78,33 +76,27 @@ public class TotvsWinthorCrawler {
 
                 TotvsSectionRecord sectionRecord = documentMapper.section(section);
                 writeJsonLine(sectionWriter, sectionRecord);
-                database.upsertSection(sectionRecord);
                 sectionCount++;
 
                 articleCount += collectArticles(
-                        properties, section, articleWriter, database, visitedArticles, articleCount);
+                        properties, section, articleWriter, visitedArticles, articleCount);
                 children.getOrDefault(section.id(), List.of()).stream()
                         .filter(child -> !visitedSections.contains(child.id()))
                         .forEach(pending::add);
             }
         }
 
-        CrawlSummary summary = new CrawlSummary(
-                sectionCount, articleCount, sectionsFile.toString(), articlesFile.toString(),
-                properties.isDatabaseEnabled() ? properties.getDatabasePath() + ".mv.db" : null,
-                OffsetDateTime.now().toString());
-        objectMapper.writerWithDefaultPrettyPrinter().writeValue(summaryFile.toFile(), summary);
-        return summary;
+        return new CrawlSummary(
+                sectionCount, articleCount, sectionsFile, articlesFile, startedAt, OffsetDateTime.now());
     }
 
     private int collectArticles(
             TotvsWinthorCollectorProperties properties,
             SectionCursor section,
             BufferedWriter writer,
-            TotvsWinthorCollectorDatabase.DatabaseSession database,
             Set<Long> visitedArticles,
             int currentTotal
-    ) throws IOException, InterruptedException, SQLException {
+    ) throws IOException, InterruptedException {
         int collected = 0;
         String nextPage = articlesUrl(properties, section.id());
         while (nextPage != null && !limitReached(currentTotal + collected, properties.getMaxArticles())) {
@@ -120,7 +112,6 @@ public class TotvsWinthorCrawler {
 
                 TotvsArticleRecord record = documentMapper.article(article, section, sourceApi);
                 writeJsonLine(writer, record);
-                database.upsertArticle(record);
                 collected++;
             }
             nextPage = textOrNull(payload.path("next_page"));
@@ -128,18 +119,19 @@ public class TotvsWinthorCrawler {
         return collected;
     }
 
-    private SectionCursor fetchRootSection(TotvsWinthorCollectorProperties properties)
+    private SectionCursor fetchRootSection(TotvsWinthorCollectorProperties properties, TotvsWinthorModule module)
             throws IOException, InterruptedException {
         JsonNode section = client.get(
-                sectionUrl(properties, properties.getRootSectionId()),
+                sectionUrl(properties, module.rootSectionId()),
                 properties.getRequestDelayMillis()).path("section");
         String name = textOrNull(section.path("name"));
+        String resolvedName = name != null ? name : module.name();
         return new SectionCursor(
-                section.path("id").asLong(properties.getRootSectionId()),
-                name != null ? name : properties.getRootSectionName(),
+                section.path("id").asLong(module.rootSectionId()),
+                resolvedName,
                 section.path("category_id").asLong(), null,
                 textOrNull(section.path("html_url")),
-                name != null ? name : properties.getRootSectionName());
+                resolvedName);
     }
 
     private Map<Long, List<SectionCursor>> loadSectionTree(
@@ -232,10 +224,10 @@ public class TotvsWinthorCrawler {
     public record CrawlSummary(
             int sections,
             int articles,
-            String sectionsFile,
-            String articlesFile,
-            String databaseFile,
-            String collectedAt
+            Path sectionsFile,
+            Path articlesFile,
+            OffsetDateTime startedAt,
+            OffsetDateTime finishedAt
     ) {
     }
 }

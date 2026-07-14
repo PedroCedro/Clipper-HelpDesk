@@ -2,26 +2,23 @@ package br.com.infocedro.clipper.collector;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
 
-// Runner de coleta sob demanda. Quando habilitado por configuração, executa o
-// crawler uma vez e encerra o contexto para não manter a API web rodando à toa.
+// Runner de coleta sob demanda. O script inicia a aplicação em modo não-web;
+// depois dos runners, o processo encerra naturalmente sem fechar o contexto
+// enquanto outros ApplicationRunner ainda estão em execução.
 @Component
 public class TotvsWinthorCrawlerRunner implements ApplicationRunner {
 
     private final TotvsWinthorCollectorProperties properties;
     private final KnowledgeCrawler crawler;
-    private final ConfigurableApplicationContext context;
 
     public TotvsWinthorCrawlerRunner(
             TotvsWinthorCollectorProperties properties,
-            KnowledgeCrawler crawler,
-            ConfigurableApplicationContext context
+            KnowledgeCrawler crawler
     ) {
         this.properties = properties;
         this.crawler = crawler;
-        this.context = context;
     }
 
     @Override
@@ -32,12 +29,12 @@ public class TotvsWinthorCrawlerRunner implements ApplicationRunner {
 
         CollectionSummary summary = crawler.crawl(TotvsWinthorSource.TYPE);
         System.out.printf(
-                "Coleta %s concluída: %d seções, %d artigos. Saída: %s%n",
+                "Coleta %s/%s concluída: %d seções, %d artigos. Saída: %s%n",
                 summary.sourceType(),
+                summary.scope(),
                 summary.containers(),
                 summary.documents(),
-                summary.outputLocation()
+                summary.outputDirectory()
         );
-        context.close();
     }
 }

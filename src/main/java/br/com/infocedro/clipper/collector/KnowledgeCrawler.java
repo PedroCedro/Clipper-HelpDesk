@@ -13,17 +13,21 @@ import org.springframework.stereotype.Service;
 public class KnowledgeCrawler {
 
     private final List<KnowledgeSource> sources;
+    private final CollectionManifestWriter manifestWriter;
 
-    public KnowledgeCrawler(List<KnowledgeSource> sources) {
+    public KnowledgeCrawler(List<KnowledgeSource> sources, CollectionManifestWriter manifestWriter) {
         this.sources = List.copyOf(sources);
+        this.manifestWriter = manifestWriter;
     }
 
     public CollectionSummary crawl(String sourceType) throws Exception {
-        return sources.stream()
+        CollectionSummary summary = sources.stream()
                 .filter(source -> source.type().equalsIgnoreCase(sourceType))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(
                         "Fonte de conhecimento não registrada: " + sourceType))
                 .collect();
+        manifestWriter.write(summary);
+        return summary;
     }
 }

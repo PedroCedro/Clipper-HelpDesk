@@ -10,12 +10,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class TotvsWinthorCollectorProperties {
 
     private boolean enabled = false;
+    private String module;
     private String locale = "pt-br";
-    private long rootSectionId = 1500000596481L;
-    private String rootSectionName = "Linha Winthor";
-    private Path outputDir = Path.of("src/main/java/br/com/infocedro/clipper/collector");
-    private boolean databaseEnabled = true;
-    private Path databasePath = Path.of("src/main/java/br/com/infocedro/clipper/collector/totvs-winthor");
+    private Path rawRoot = Path.of("var/knowledge/raw");
     private int perPage = 100;
     private long requestDelayMillis = 250;
     private int maxSections = 0;
@@ -29,6 +26,14 @@ public class TotvsWinthorCollectorProperties {
         this.enabled = enabled;
     }
 
+    public String getModule() {
+        return module;
+    }
+
+    public void setModule(String module) {
+        this.module = module;
+    }
+
     public String getLocale() {
         return locale;
     }
@@ -37,44 +42,12 @@ public class TotvsWinthorCollectorProperties {
         this.locale = locale;
     }
 
-    public long getRootSectionId() {
-        return rootSectionId;
+    public Path getRawRoot() {
+        return rawRoot;
     }
 
-    public void setRootSectionId(long rootSectionId) {
-        this.rootSectionId = rootSectionId;
-    }
-
-    public String getRootSectionName() {
-        return rootSectionName;
-    }
-
-    public void setRootSectionName(String rootSectionName) {
-        this.rootSectionName = rootSectionName;
-    }
-
-    public Path getOutputDir() {
-        return outputDir;
-    }
-
-    public void setOutputDir(Path outputDir) {
-        this.outputDir = outputDir;
-    }
-
-    public boolean isDatabaseEnabled() {
-        return databaseEnabled;
-    }
-
-    public void setDatabaseEnabled(boolean databaseEnabled) {
-        this.databaseEnabled = databaseEnabled;
-    }
-
-    public Path getDatabasePath() {
-        return databasePath;
-    }
-
-    public void setDatabasePath(Path databasePath) {
-        this.databasePath = databasePath;
+    public void setRawRoot(Path rawRoot) {
+        this.rawRoot = rawRoot;
     }
 
     public int getPerPage() {
