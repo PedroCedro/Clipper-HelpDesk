@@ -145,6 +145,16 @@ na coleta mais recente de um módulo pode ser feita com:
   -Modulo 14-faturamento -Query "rejeição 1026"
 ```
 
+Importar a coleta completa mais recente para o catálogo bruto local:
+
+```powershell
+.\src\main\java\br\com\infocedro\clipper\catalog\import-raw.ps1 `
+  -Modulo 14-faturamento
+```
+
+O importador valida o manifesto e os hashes antes do upsert. Documentos brutos
+permanecem separados dos artigos aprovados usados pelo diagnóstico.
+
 ## Estado atual
 
 - o backend roda na raiz do projeto com `pom.xml`, `src/` e `mvnw.cmd`
