@@ -1,6 +1,7 @@
 package br.com.infocedro.clipper.curation;
 
 import java.util.Optional;
+import java.util.List;
 
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,6 +10,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 interface CurationCaseRepository extends JpaRepository<CurationCase, Long> {
+
+    List<CurationCase> findAllByOrderByUpdatedAtDescIdDesc();
+
+    List<CurationCase> findByStatusOrderByUpdatedAtDescIdDesc(CurationStatus status);
 
     // Serializa mudanças de candidatos do mesmo caso para sustentar a
     // idempotência e a transição única do primeiro vínculo.

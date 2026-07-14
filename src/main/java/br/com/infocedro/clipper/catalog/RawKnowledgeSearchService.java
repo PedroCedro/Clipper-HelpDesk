@@ -62,6 +62,11 @@ public class RawKnowledgeSearchService {
                 .orElseThrow(() -> new RawDocumentNotFoundException(id));
     }
 
+    /** Confirma identidade sem carregar os campos TEXT usados apenas no detalhe. */
+    public boolean exists(Long id) {
+        return id != null && repository.existsById(id);
+    }
+
     private RawSearchItem rank(
             RawSearchCandidate candidate,
             Set<String> tokens,

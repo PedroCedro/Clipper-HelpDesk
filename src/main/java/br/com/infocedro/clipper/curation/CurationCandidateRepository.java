@@ -1,6 +1,7 @@
 package br.com.infocedro.clipper.curation;
 
 import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -9,4 +10,6 @@ interface CurationCandidateRepository extends JpaRepository<CurationCandidate, L
     Optional<CurationCandidate> findByCurationCase_IdAndDocumentId(Long caseId, Long documentId);
 
     long countByCurationCase_Id(Long caseId);
+
+    List<CurationCandidate> findByCurationCase_IdOrderByCreatedAtAscIdAsc(Long caseId);
 }

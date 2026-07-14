@@ -1,6 +1,5 @@
 package br.com.infocedro.clipper.curation;
 
-import br.com.infocedro.clipper.catalog.RawDocumentNotFoundException;
 import br.com.infocedro.clipper.catalog.RawKnowledgeSearchService;
 import org.springframework.stereotype.Component;
 
@@ -16,11 +15,6 @@ class CurationCatalogAdapter implements CurationCatalogPort {
 
     @Override
     public boolean exists(Long documentId) {
-        try {
-            catalogService.findDetail(documentId);
-            return true;
-        } catch (RawDocumentNotFoundException exception) {
-            return false;
-        }
+        return catalogService.exists(documentId);
     }
 }

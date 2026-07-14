@@ -68,6 +68,10 @@ public class CurationCandidateEvent {
         return eventType;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public Long getDocumentId() {
         return documentId;
     }

@@ -1,6 +1,7 @@
 package br.com.infocedro.clipper.catalog;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,6 +23,14 @@ class RawKnowledgeSearchServiceTest {
     void setUp() {
         repository = mock(RawKnowledgeDocumentRepository.class);
         service = new RawKnowledgeSearchService(repository);
+    }
+
+    @Test
+    void verificaExistenciaSemCarregarDetalhe() {
+        when(repository.existsById(7L)).thenReturn(true);
+
+        assertTrue(service.exists(7L));
+        assertFalse(service.exists(null));
     }
 
     @Test

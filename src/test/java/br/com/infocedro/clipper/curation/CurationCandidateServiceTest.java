@@ -23,6 +23,8 @@ class CurationCandidateServiceTest {
     @Autowired
     private CurationCaseService caseService;
     @Autowired
+    private CurationQueryService queryService;
+    @Autowired
     private CurationCaseRepository caseRepository;
     @Autowired
     private CurationCaseTransitionRepository transitionRepository;
@@ -173,6 +175,29 @@ class CurationCandidateServiceTest {
         assertThatThrownBy(() -> candidateService.add(
                 curationCase.id(), 101L, comando("Não pode associar")))
                 .isInstanceOf(InvalidCurationTransitionException.class);
+    }
+
+    @Test
+    void consultaDetalheComContagemVinculosEHistoricosOrdenados() {
+        CurationCaseSnapshot curationCase = abreCaso();
+        when(catalogPort.exists(101L)).thenReturn(true);
+        candidateService.add(curationCase.id(), 101L, comando("Associar"));
+        candidateService.remove(curationCase.id(), 101L, comando("Remover"));
+
+        CurationCaseDetail detail = queryService.detail(curationCase.id());
+
+        assertThat(detail.candidateCount()).isZero();
+        assertThat(detail.candidates()).isEmpty();
+        assertThat(detail.transitions())
+                .extracting(CurationTransitionView::toStatus)
+                .containsExactly(CurationStatus.ABERTO, CurationStatus.COM_CANDIDATOS);
+        assertThat(detail.candidateEvents())
+                .extracting(CurationCandidateEventView::eventType)
+                .containsExactly(CurationCandidateEventType.ADDED, CurationCandidateEventType.REMOVED);
+        assertThat(queryService.list(CurationStatus.COM_CANDIDATOS))
+                .singleElement()
+                .extracting(CurationCaseSummary::candidateCount)
+                .isEqualTo(0L);
     }
 
     private CurationCaseSnapshot abreCaso() {
