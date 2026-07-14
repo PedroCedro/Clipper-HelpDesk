@@ -95,6 +95,8 @@ GET  /api/health
 GET  /api/tickets
 POST /api/tickets
 POST /api/tickets/{id}/diagnose
+GET  /api/raw-documents/search?q={texto}&page=0&size=20
+GET  /api/raw-documents/{id}
 ```
 
 ## Como executar o frontend
@@ -154,6 +156,10 @@ Importar a coleta completa mais recente para o catálogo bruto local:
 
 O importador valida o manifesto e os hashes antes do upsert. Documentos brutos
 permanecem separados dos artigos aprovados usados pelo diagnóstico.
+
+A API do catálogo é somente leitura. A busca aceita filtros opcionais
+`sourceType` e `module`, retorna pontuação e motivos do match; o detalhe expõe
+texto, origem e metadados pesquisáveis, mas nunca o snapshot HTML bruto.
 
 ## Estado atual
 
