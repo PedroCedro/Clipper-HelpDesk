@@ -12,6 +12,13 @@ public interface RawKnowledgeDocumentRepository extends JpaRepository<RawKnowled
     List<RawKnowledgeDocument> findBySourceTypeAndExternalIdIn(String sourceType, Collection<String> externalIds);
 
     @Query("""
+            select d.id as id, d.externalId as externalId, d.contentHash as contentHash
+              from RawKnowledgeDocument d
+             where d.sourceType = :sourceType
+            """)
+    List<RawDocumentIdentityProjection> findIdentitiesBySourceType(@Param("sourceType") String sourceType);
+
+    @Query("""
             select d.id as id, d.sourceType as sourceType, d.title as title,
                    d.module as module, d.sourceUrl as sourceUrl
               from RawKnowledgeDocument d
