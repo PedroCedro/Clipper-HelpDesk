@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import CurationQueue from "../components/CurationQueue";
 import CurationDetail from "../components/CurationDetail";
-import type { CurationCaseDetail, CurationCaseSummary, CurationStatus } from "../types";
+import type { CurationCaseDetail, CurationCaseSummary, CurationStatus, Ticket } from "../types";
 
 const OPERATOR_KEY = "clipper.curation.operator";
 
@@ -12,9 +12,14 @@ type AuditAction = {
   run: (reason: string) => Promise<void>;
 };
 
-type Props = { onOpenTickets: () => void };
+type Props = {
+  pendingTicket: Ticket | null;
+  ticketCount: number;
+  onPendingTicketHandled: () => void;
+  onOpenTickets: () => void;
+};
 
-export default function CurationWorkspace({ onOpenTickets }: Props) {
+export default function CurationWorkspace({ pendingTicket, ticketCount, onPendingTicketHandled, onOpenTickets }: Props) {
   const [cases, setCases] = useState<CurationCaseSummary[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [detail, setDetail] = useState<CurationCaseDetail | null>(null);
@@ -27,6 +32,7 @@ export default function CurationWorkspace({ onOpenTickets }: Props) {
   const [auditAction, setAuditAction] = useState<AuditAction | null>(null);
   const [auditReason, setAuditReason] = useState("");
   const [auditBusy, setAuditBusy] = useState(false);
+  const [ticketReason, setTicketReason] = useState("");
 
   useEffect(() => {
     if (operator.trim()) localStorage.setItem(OPERATOR_KEY, operator.trim());
@@ -102,11 +108,34 @@ export default function CurationWorkspace({ onOpenTickets }: Props) {
     }
   }
 
+  async function sendPendingTicket() {
+    if (!pendingTicket || !operator.trim() || !ticketReason.trim()) return;
+    setAuditBusy(true);
+    setActionError(null);
+    try {
+      const response = await fetch(`/api/tickets/${pendingTicket.id}/curation-case`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Actor": operator.trim() },
+        body: JSON.stringify({ reason: ticketReason.trim() }),
+      });
+      if (!response.ok) throw new Error(`Não foi possível enviar o ticket (HTTP ${response.status}).`);
+      const result = (await response.json()) as { curationCase: CurationCaseSummary; created: boolean };
+      onPendingTicketHandled();
+      setTicketReason("");
+      await loadCases();
+      setSelectedId(result.curationCase.id);
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Falha ao enviar ticket para curadoria.");
+    } finally {
+      setAuditBusy(false);
+    }
+  }
+
   const visibleCount = useMemo(() => cases.filter((item) => item.status !== "DESCARTADO").length, [cases]);
 
   return (
     <div className="app">
-      <Sidebar ticketCount={0} curationCount={visibleCount} active="curation" onOpenTickets={onOpenTickets} />
+      <Sidebar ticketCount={ticketCount} curationCount={visibleCount} active="curation" onOpenTickets={onOpenTickets} />
       <main className="workspace">
         <header className="curation-topbar">
           <div><span className="d-eyebrow">Clipper</span><h1>Curadoria de conhecimento</h1></div>
@@ -166,6 +195,36 @@ export default function CurationWorkspace({ onOpenTickets }: Props) {
             }}
           />
         </div>
+        {pendingTicket ? (
+          <div className="audit-backdrop" role="presentation">
+            <section className="audit-dialog" role="dialog" aria-modal="true" aria-labelledby="ticket-curation-title">
+              <span className="d-eyebrow">Ticket #{pendingTicket.id}</span>
+              <h2 id="ticket-curation-title">Enviar para curadoria</h2>
+              <p>{pendingTicket.title}</p>
+              <label>
+                Motivo da curadoria
+                <textarea
+                  autoFocus
+                  value={ticketReason}
+                  onChange={(event) => setTicketReason(event.target.value)}
+                  rows={4}
+                  placeholder="Explique por que este caso pode gerar conhecimento reutilizável…"
+                />
+              </label>
+              {!operator.trim() ? <p className="inline-warning">Preencha o operador no topo para continuar.</p> : null}
+              <div className="audit-actions">
+                <button className="btn-ghost" disabled={auditBusy} onClick={onPendingTicketHandled}>Cancelar</button>
+                <button
+                  className="btn-primary"
+                  disabled={auditBusy || !operator.trim() || !ticketReason.trim()}
+                  onClick={() => void sendPendingTicket()}
+                >
+                  {auditBusy ? "Enviando…" : "Criar caso de curadoria"}
+                </button>
+              </div>
+            </section>
+          </div>
+        ) : null}
         {auditAction ? (
           <div className="audit-backdrop" role="presentation">
             <section className="audit-dialog" role="dialog" aria-modal="true" aria-labelledby="audit-title">

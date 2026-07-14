@@ -7,6 +7,7 @@ type TicketDetailProps = {
   diag: DiagnoseState | undefined;
   onDiagnose: (id: number) => void;
   actions: TicketActions;
+  onSendToCuration: (ticket: Ticket) => void;
 };
 
 // Prioridade legível no meta-grid; valor desconhecido passa cru — dado
@@ -20,7 +21,7 @@ const prioLabel: Record<string, string> = {
 // Painel de detalhe do ticket selecionado. O meta-grid mostra SÓ os
 // campos que existem — célula vazia ou "null" na tela seria só ruído
 // (tickets antigos no banco não têm esses campos).
-export default function TicketDetail({ ticket, diag, onDiagnose, actions }: TicketDetailProps) {
+export default function TicketDetail({ ticket, diag, onDiagnose, actions, onSendToCuration }: TicketDetailProps) {
   if (!ticket) {
     return (
       <section className="detail" aria-label="Detalhe do ticket">
@@ -61,6 +62,9 @@ export default function TicketDetail({ ticket, diag, onDiagnose, actions }: Tick
         <span className={`badge ${chip.className}`}>
           <span className="dot" /> {chip.label}
         </span>
+        <button className="btn-ghost btn-small" onClick={() => onSendToCuration(ticket)}>
+          Enviar para curadoria
+        </button>
       </div>
 
       {meta.length > 0 ? (

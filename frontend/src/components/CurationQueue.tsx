@@ -20,7 +20,7 @@ type Props = {
 export default function CurationQueue({ cases, selectedId, loading, error, onSelect }: Props) {
   if (loading) return <div className="queue-empty">Carregando casos de curadoria…</div>;
   if (error) return <div className="queue-error">{error}</div>;
-  if (cases.length === 0) return <div className="queue-empty">Nenhum caso neste filtro.</div>;
+  if (cases.length === 0) return <div className="queue-empty">Nenhum caso neste filtro. Envie um ticket para curadoria ou escolha outro status.</div>;
 
   return (
     <div className="curation-list">

@@ -10,9 +10,13 @@ import type { DiagnoseState, DiagnosticResult, Ticket, TicketActions } from "../
 // Página do console: DONA de todo o estado (tickets, seleção, busca,
 // diagnósticos). Os componentes abaixo dela são apresentação — mesma
 // filosofia do backend: um orquestrador magro, peças pequenas.
-type ConsoleProps = { onOpenCuration: () => void };
+type ConsoleProps = {
+  onOpenCuration: () => void;
+  onSendToCuration: (ticket: Ticket) => void;
+  onTicketCountChange: (count: number) => void;
+};
 
-export default function Console({ onOpenCuration }: ConsoleProps) {
+export default function Console({ onOpenCuration, onSendToCuration, onTicketCountChange }: ConsoleProps) {
   const [theme, setTheme] = useTheme();
 
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -27,6 +31,8 @@ export default function Console({ onOpenCuration }: ConsoleProps) {
   // resultado, então o cache é só pra não rebuscar a cada clique — a
   // fonte da verdade é GET /tickets/{id}/diagnosis.
   const [diagnoses, setDiagnoses] = useState<Record<number, DiagnoseState>>({});
+
+  useEffect(() => onTicketCountChange(tickets.length), [tickets.length, onTicketCountChange]);
 
   useEffect(() => {
     let isMounted = true;
@@ -240,6 +246,7 @@ export default function Console({ onOpenCuration }: ConsoleProps) {
             diag={selectedTicket ? diagnoses[selectedTicket.id] : undefined}
             onDiagnose={handleDiagnose}
             actions={actions}
+            onSendToCuration={onSendToCuration}
           />
         </div>
       </div>

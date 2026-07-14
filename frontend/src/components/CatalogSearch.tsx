@@ -12,10 +12,12 @@ export default function CatalogSearch({ linkedIds, disabled, onAdd }: Props) {
   const [items, setItems] = useState<RawSearchItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searched, setSearched] = useState(false);
 
   async function search() {
     if (query.trim().length < 2) return;
     setLoading(true);
+    setSearched(true);
     setError(null);
     try {
       const response = await fetch(`/api/raw-documents/search?q=${encodeURIComponent(query.trim())}&size=10`);
@@ -44,6 +46,10 @@ export default function CatalogSearch({ linkedIds, disabled, onAdd }: Props) {
         </button>
       </div>
       {error ? <p className="curation-error">{error}</p> : null}
+      {!error && searched && !loading && items.length === 0 ? (
+        <p className="catalog-empty">Nenhuma fonte encontrada. Tente uma rotina, código de erro ou termo mais específico.</p>
+      ) : null}
+      {!searched ? <p className="catalog-hint">Pesquise no catálogo bruto para encontrar evidências oficiais.</p> : null}
       <div className="catalog-results">
         {items.map((item) => {
           const linked = linkedIds.has(item.id);
